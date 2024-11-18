@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import { useEffect, useRef, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
+import { MENU_OPTIONS, USER_OPTIONS } from "@/constants/menu";
 
 const MainNav = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -42,35 +43,19 @@ const MainNav = () => {
                 </Link>
 
                 {/* Navigation links for larger screens */}
-                <div className="hidden md:flex items-center space-x-8">
-                    <Link
-                        to="/home"
-                        className={`text-gray-900 dark:text-white ${location.pathname === "/home" ? "bg-blue-700 p-2 rounded" : "hover:text-blue-700"
-                            }`}
-                    >
-                        Home
-                    </Link>
-                    <Link
-                        to="/about"
-                        className={`text-gray-900 dark:text-white ${location.pathname === "/about" ? "bg-blue-700 p-2 rounded" : "hover:text-blue-700"
-                            }`}
-                    >
-                        About
-                    </Link>
-                    <Link
-                        to="/services"
-                        className={`text-gray-900 dark:text-white ${location.pathname === "/services" ? "bg-blue-700 p-2 rounded" : "hover:text-blue-700"
-                            }`}
-                    >
-                        Services
-                    </Link>
-                    <Link
-                        to="/contact"
-                        className={`text-gray-900 dark:text-white ${location.pathname === "/contact" ? "bg-blue-700 p-2 rounded" : "hover:text-blue-700"
-                            }`}
-                    >
-                        Contact
-                    </Link>
+                <div className="hidden md:flex items-center space-x-3">
+                    {
+                        MENU_OPTIONS.map((option, index) => (
+                            <Link
+                                to={option.to}
+                                className={`text-gray-900 dark:text-white p-2 rounded ${location.pathname === option.to ? "bg-blue-700 text-white" : "hover:bg-blue-700 hover:text-white"
+                                    }`}
+                                key={index}
+                            >
+                                {option.title}
+                            </Link>
+                        ))
+                    }
                 </div>
 
                 {/* User Dropdown and Mode Toggle */}
@@ -114,38 +99,18 @@ const MainNav = () => {
                                     </span>
                                 </div>
                                 <ul className="py-2" aria-labelledby="user-menu-button">
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                        >
-                                            Dashboard
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                        >
-                                            Settings
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                        >
-                                            Earnings
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                        >
-                                            Sign out
-                                        </Link>
-                                    </li>
+                                    {
+                                        USER_OPTIONS.map((option, index) => (
+                                            <li key={index}>
+                                                <Link
+                                                    to={option.to}
+                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                                >
+                                                    {option.title}
+                                                </Link>
+                                            </li>
+                                        ))
+                                    }
                                 </ul>
                             </div>
                         )}
@@ -189,40 +154,20 @@ const MainNav = () => {
                         id="navbar-user"
                         ref={navDropdown}
                     >
-                        <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-background md:dark:bg-background dark:border-gray-700">
-                            <li>
-                                <Link
-                                    to="#"
-                                    className={`block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500 ${location.pathname === "/home" && "text-blue-700"}`}
-                                    aria-current="page"
-                                >
-                                    Home
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/about"
-                                    className={`block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 ${location.pathname === "/about" && "text-blue-700"}`}
-                                >
-                                    About
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/services"
-                                    className={`block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 ${location.pathname === "/services" && "text-blue-700"}`}
-                                >
-                                    Services
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/contact"
-                                    className={`block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 ${location.pathname === "/contact" && "text-blue-700"}`}
-                                >
-                                    Contact
-                                </Link>
-                            </li>
+                        <ul className="flex gap-1 flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-background md:dark:bg-background dark:border-gray-700">
+                            {
+                                MENU_OPTIONS.map((option, index) => (
+                                    <li key={index}>
+                                        <Link
+                                            to={option.to}
+                                            className={`block py-2 px-3 text-gray-900 rounded hover:bg-gray-200 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 ${location.pathname === option.to && "bg-gray-200 md:dark:text-blue-500 dark:bg-gray-700 dark:text-white md:dark:bg-transparent"}`}
+                                            aria-current="page"
+                                        >
+                                            {option.title}
+                                        </Link>
+                                    </li>
+                                ))
+                            }
                         </ul>
                     </div>
                 )}
