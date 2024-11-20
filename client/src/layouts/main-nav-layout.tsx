@@ -1,14 +1,15 @@
 import MainNav from "@/components/MainNav"
 import { Outlet } from "react-router-dom"
+import { ProtectedRoute } from "./ProtectedLayout"
 
 const MainLayout = () => {
     return (
-        <div>
+        <ProtectedRoute>
             <MainNav />
             <div>
                 <Outlet />
             </div>
-        </div>
+        </ProtectedRoute>
     )
 }
 

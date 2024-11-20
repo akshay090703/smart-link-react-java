@@ -1,10 +1,15 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useEffect, useRef, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
-import { MENU_OPTIONS, USER_OPTIONS } from "@/constants/menu";
+import { MENU_OPTIONS } from "@/constants/menu";
+import { AxiosResponse } from "axios";
+import { apiClient } from "@/lib/api-client";
+import toast from "react-hot-toast";
 
 const MainNav = () => {
+    const navigate = useNavigate();
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isNavbarOpen, setIsNavbarOpen] = useState(false); // State for the navbar menu
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,6 +38,24 @@ const MainNav = () => {
             document.removeEventListener("mousedown", handleClickOutsideNav);
         };
     }, []);
+
+    const handleSignOut = async () => {
+        try {
+            const res: AxiosResponse = await apiClient.get("/auth/logout");
+
+            // console.log(res);
+
+            if (res.status === 200) {
+                const data = res.data;
+                console.log(data);
+
+                navigate("/")
+                toast.success("User successfully Logged out!")
+            }
+        } catch (error) {
+            toast.error("There was some error");
+        }
+    }
 
     return (
         <nav className="dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800">
@@ -99,18 +122,23 @@ const MainNav = () => {
                                     </span>
                                 </div>
                                 <ul className="py-2" aria-labelledby="user-menu-button">
-                                    {
-                                        USER_OPTIONS.map((option, index) => (
-                                            <li key={index}>
-                                                <Link
-                                                    to={option.to}
-                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                                >
-                                                    {option.title}
-                                                </Link>
-                                            </li>
-                                        ))
-                                    }
+
+                                    <li>
+                                        <Link
+                                            to="/dashboard"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                        <div
+                                            onClick={handleSignOut}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"
+                                        >
+                                            Sign out
+                                        </div>
+                                    </li>
+
+
                                 </ul>
                             </div>
                         )}

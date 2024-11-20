@@ -16,6 +16,7 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
 
+          {/* Makes it a protected route sync with the backend */}
           <Route element={<MainLayout />}>
             <Route path="/home" element={<HomePage />} />
           </Route>

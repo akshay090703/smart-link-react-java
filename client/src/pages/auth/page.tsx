@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
@@ -48,11 +48,11 @@ export default function AuthPage() {
         };
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(loginEmail)) {
             newErrors.email = "Invalid email address.";
         }
 
-        if (password.length < 6) {
+        if (loginPassword.length < 6) {
             newErrors.password = "Password must be at least 6 characters.";
         }
 
@@ -166,15 +166,30 @@ export default function AuthPage() {
 
     const onLogin = async (event: React.FormEvent) => {
         event?.preventDefault();
+        setIsLoading(true);
 
         if (!validateLoginInput()) {
             toast.error("Please fix all the error!")
+            setIsLoading(false);
             return
         }
-        setIsLoading(true);
 
-        setIsLoading(false);
-        navigate("/home");
+        try {
+            const res: AxiosResponse = await apiClient.post("/auth/login", { loginEmail, loginPassword })
+
+            if (res.status === 200) {
+                const data = res.data;
+                // console.log(data);
+                toast.success("Logged in successfully!");
+
+                navigate("/home");
+            }
+        } catch (error) {
+            toast.error("There was some error");
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     async function onSignUp(event: React.FormEvent) {
