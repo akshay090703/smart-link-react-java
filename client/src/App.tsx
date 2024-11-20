@@ -3,8 +3,8 @@ import RootLayout from "./layouts/root-layout"
 import AuthPage from "./pages/auth/page"
 import LandingPage from './pages/landing-page/page';
 import MainLayout from "./layouts/main-nav-layout";
-import HomePage from "./pages/home/page";
 import { Toaster } from "react-hot-toast"
+import DashboardPage from "./pages/dashboard/page";
 
 const App = () => {
   return (
@@ -18,7 +18,7 @@ const App = () => {
 
           {/* Makes it a protected route sync with the backend */}
           <Route element={<MainLayout />}>
-            <Route path="/home" element={<HomePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
         </Route>
       </Routes>

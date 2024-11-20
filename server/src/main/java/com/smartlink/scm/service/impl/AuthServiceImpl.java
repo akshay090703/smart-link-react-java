@@ -2,6 +2,7 @@ package com.smartlink.scm.service.impl;
 
 import com.smartlink.scm.forms.JwtResponse;
 import com.smartlink.scm.forms.LoginForm;
+import com.smartlink.scm.helpers.AppConstants;
 import com.smartlink.scm.helpers.ResourceNotFoundException;
 import com.smartlink.scm.model.Providers;
 import com.smartlink.scm.model.User;
@@ -44,6 +45,10 @@ public class AuthServiceImpl implements AuthService {
         user.setUserId(userId);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        user.setRoleList(List.of(AppConstants.ROLE_USER));
+
+        logger.info(user.getProvider().toString());
 
         return userRepo.save(user);
     }
@@ -153,13 +158,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<?> isUserLoggedIn(HttpServletRequest request) {
-        final String authHeader = request.getHeader("Authorization");
         String jwt = null;
         String email = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-        } else if (request.getCookies() != null) {
+        if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("JWT_TOKEN".equals(cookie.getName())) {
                     jwt = cookie.getValue();
