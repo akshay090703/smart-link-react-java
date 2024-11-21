@@ -154,6 +154,10 @@ public class AuthServiceImpl implements AuthService {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
+        // not necessary as we are not maintaining any authentication state
+        // on the server (STATELESS authorization)
+        SecurityContextHolder.clearContext();
+
         return new ResponseEntity<>("Logout successful", HttpStatus.OK);
     }
 

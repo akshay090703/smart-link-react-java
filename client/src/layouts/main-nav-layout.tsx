@@ -4,7 +4,7 @@ import { ProtectedRoute } from "./ProtectedLayout"
 
 const MainLayout = () => {
     return (
-        <ProtectedRoute>
+        <ProtectedRoute isAuth={false}>
             <MainNav />
             <div>
                 <Outlet />

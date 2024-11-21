@@ -5,6 +5,7 @@ import LandingPage from './pages/landing-page/page';
 import MainLayout from "./layouts/main-nav-layout";
 import { Toaster } from "react-hot-toast"
 import DashboardPage from "./pages/dashboard/page";
+import { ProtectedRoute } from './layouts/ProtectedLayout';
 
 const App = () => {
   return (
@@ -14,7 +15,11 @@ const App = () => {
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth" element={
+            <ProtectedRoute isAuth={true}>
+              <AuthPage />
+            </ProtectedRoute>
+          } />
 
           {/* Makes it a protected route sync with the backend */}
           <Route element={<MainLayout />}>

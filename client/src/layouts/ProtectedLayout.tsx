@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+export const ProtectedRoute = ({
+  children,
+  isAuth,
+}: {
+  children: React.ReactNode;
+  isAuth: boolean;
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -13,8 +19,13 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       try {
         const res = await apiClient.get("/auth/isLoggedIn");
         setIsAuthenticated(res.status === 200);
+
+        isAuth && toast('You are already logged in!', {
+          icon: '👍',
+        });
       } catch (error) {
-        toast.error("Please login to continue!")
+        !isAuth && toast.error("Please login to continue!");
+
         setIsAuthenticated(false);
       } finally {
         setLoading(false);
@@ -32,5 +43,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     </div>
   </div>;
 
-  return isAuthenticated ? children : <Navigate to="/auth" />;
+  return isAuth ?
+    (isAuthenticated ? <Navigate to="/dashboard" /> : children)
+    :
+    (isAuthenticated ? children : <Navigate to="/auth" />);
 };
