@@ -87,7 +87,7 @@ const LoginForm = () => {
                 navigate("/dashboard");
             }
         } catch (error) {
-            toast.error("There was some error");
+            toast.error("Credentials do not match or login with social links!");
             console.error(error);
         } finally {
             setTimeout(() => {

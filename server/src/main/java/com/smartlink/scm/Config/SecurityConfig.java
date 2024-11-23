@@ -1,32 +1,62 @@
 package com.smartlink.scm.Config;
 
+import com.smartlink.scm.model.Providers;
+import com.smartlink.scm.model.User;
+import com.smartlink.scm.service.JwtUtil;
+import com.smartlink.scm.service.impl.AuthServiceImpl;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
+
 @Configuration
 public class SecurityConfig {
+    @Autowired
+    private OAuthGoogleSuccessHandler successHandler;
+
+    @Autowired
+    private OAuthGoogleFailureHandler failureHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/**")
+                    .requestMatchers("/auth/**", "/oauth2/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/google")
+                        .successHandler(successHandler)
+                        .failureHandler(failureHandler)
+                );
 
         return http.build();
     }
@@ -34,11 +64,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder () {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -54,6 +79,14 @@ public class SecurityConfig {
         return source;
     }
 }
+
+
+
+
+
+
+
+
 
 //    public UserDetailsService userDetailsService() {
 //        UserDetails user1 = User.withDefaultPasswordEncoder()

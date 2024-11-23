@@ -8,7 +8,7 @@ import { GoogleLoginButton } from "./_components/GoogleLoginButton";
 
 export default function AuthPage() {
     const handleGoogleLogin = () => {
-        console.log('Logging in with Google...');
+        window.location.href = `${import.meta.env.VITE_SERVER_URL}/oauth2/authorization/google`
     };
 
     const handleGithubLogin = () => {
