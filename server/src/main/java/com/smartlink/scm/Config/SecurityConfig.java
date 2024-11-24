@@ -45,7 +45,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/**", "/oauth2/**")
+                    .requestMatchers("/auth/**", "/oauth2/**", "/login")
                     .permitAll()
                     .anyRequest()
                     .authenticated()
@@ -53,7 +53,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth -> oauth
-                        .loginPage("/oauth2/authorization/google")
                         .successHandler(successHandler)
                         .failureHandler(failureHandler)
                 );

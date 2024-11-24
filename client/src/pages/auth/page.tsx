@@ -12,7 +12,7 @@ export default function AuthPage() {
     };
 
     const handleGithubLogin = () => {
-        console.log('Logging in with GitHub...');
+        window.location.href = `${import.meta.env.VITE_SERVER_URL}/oauth2/authorization/github`
     };
 
     return (

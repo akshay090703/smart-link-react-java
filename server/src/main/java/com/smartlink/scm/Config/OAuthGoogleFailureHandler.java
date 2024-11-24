@@ -22,6 +22,8 @@ public class OAuthGoogleFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         logger.info("onAuthenticationFailure");
+        logger.info(exception.getMessage());
+        System.out.println(exception.getMessage());
 
         response.sendRedirect(appClient + "/auth");
     }

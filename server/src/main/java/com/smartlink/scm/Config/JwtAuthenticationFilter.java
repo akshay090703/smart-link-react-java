@@ -29,13 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String jwt = null;
-        String email = null;
-
         try {
-            // Extract JWT from cookies
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
+            Cookie[] cookies = request.getCookies();
+            String jwt = null;
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
                     if ("JWT_TOKEN".equals(cookie.getName())) {
                         jwt = cookie.getValue();
                         break;
@@ -43,44 +42,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            // Validate the JWT and extract email
-            if (jwt != null) {
-                email = jwtUtil.extractEmail(jwt);
+            if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String email = jwtUtil.extractEmail(jwt);
+                if (email != null && jwtUtil.isTokenValid(jwt, email)) {
+                    User user = authService.getUserByEmail(email)
+                            .orElseThrow(() -> new IllegalArgumentException("User not found for the provided token"));
 
-                if (email == null || !jwtUtil.isTokenValid(jwt, email)) {
-                    throw new IllegalArgumentException("Invalid or expired token");
-                }
-            }
-
-            // Authenticate the user if the email is valid and authentication context is empty
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Optional<User> user = authService.getUserByEmail(email);
-
-                if (user.isPresent()) {
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(user.get(), null, user.get().getAuthorities());
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                } else {
-                    throw new IllegalArgumentException("User not found for the provided token");
+
+                    logger.info("Authentication successful for user: " + email);
                 }
             }
 
-            // Proceed with the filter chain
             filterChain.doFilter(request, response);
 
         } catch (IllegalArgumentException e) {
-            // Handle invalid token cases
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+            response.getWriter().write("{\"error\": \"Unauthorized access\"}");
             logger.warn("Authentication failed: " + e.getMessage() + " - IP: " + request.getRemoteAddr());
         } catch (Exception e) {
-            // Handle unexpected errors
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"An unexpected error occurred\"}");
             logger.error("Unexpected error during authentication", e);
         }
     }
-
 }

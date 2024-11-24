@@ -57,6 +57,20 @@ const MainNav = () => {
         }
     }
 
+    const profileInfo = async () => {
+        const res = await apiClient.get("/user/profile");
+
+        console.log(res);
+
+        if (res.status === 200) {
+            const data = res.data;
+            console.log(data);
+        } else if (res.status === 401) {
+            console.log("Unauthorized");
+        }
+
+    }
+
     return (
         <nav className="dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -124,12 +138,13 @@ const MainNav = () => {
                                 <ul className="py-2" aria-labelledby="user-menu-button">
 
                                     <li>
-                                        <Link
-                                            to="/dashboard"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                        <div
+                                            onClick={profileInfo}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"
+
                                         >
                                             Dashboard
-                                        </Link>
+                                        </div>
                                         <div
                                             onClick={handleSignOut}
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"

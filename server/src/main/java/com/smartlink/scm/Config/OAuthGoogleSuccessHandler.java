@@ -36,8 +36,6 @@ public class OAuthGoogleSuccessHandler implements AuthenticationSuccessHandler {
     private JwtUtil jwtUtil;
 
     Logger logger = LoggerFactory.getLogger(OAuthGoogleSuccessHandler.class);
-    @Autowired
-    private UserRepo userRepo;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -47,31 +45,59 @@ public class OAuthGoogleSuccessHandler implements AuthenticationSuccessHandler {
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         Map<String, Object> attributes = token.getPrincipal().getAttributes();
 
-        String fullName = (String) attributes.get("name");
-        String email = (String) attributes.get("email");
-        String picture = (String) attributes.get("picture");
-        Boolean emailVerified = (Boolean) attributes.get("email_verified");
-        String accessToken = (String) token.getPrincipal().getAttributes().get("access_token");
-        String providerId = (String) token.getName();
+        String registrationId = token.getAuthorizedClientRegistrationId();
+        String redirectUrl = appClient + "/dashboard";
 
-        System.out.println(accessToken);
+        String fullName;
+        String email;
+        String picture;
+        String providerId;
+        Providers providerName;
+        String about;
 
         User user = new User();
+
+        if(registrationId.equalsIgnoreCase("google")) {
+            fullName = (String) attributes.get("name");
+            email = (String) attributes.get("email");
+            picture = (String) attributes.get("picture");
+            providerId = (String) token.getName();
+            providerName = Providers.GOOGLE;
+            about = "This user is created using Google.";
+
+            redirectUrl = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue="  + appClient + "/dashboard";
+        } else if(registrationId.equalsIgnoreCase("github")) {
+            fullName = (String) attributes.get("name");
+            email = (String) attributes.get("email");
+            picture = (String) attributes.get("avatar_url");
+            providerId = (String) token.getName();
+            providerName = Providers.GITHUB;
+            about = "This user is created using Github.";
+        } else {
+            logger.error("Unknown Provider");
+            response.sendRedirect(appClient + "/auth");
+            return;
+        }
+
+        if(email == null) {
+            email = attributes.get("login").toString() + "@gmail.com";
+        }
 
         user.setName(fullName);
         user.setEmail(email);
         user.setProfilePic(picture);
         user.setPassword("password");
         user.setUserId(UUID.randomUUID().toString());
-        user.setProvider(Providers.GOOGLE);
+        user.setProvider(providerName);
         user.setEnabled(true);
-        user.setEmailVerified(emailVerified);
+        user.setEmailVerified(true);
         user.setProviderId(providerId);
         user.setRoleList(List.of(AppConstants.ROLE_USER));
-        user.setAbout("This user is created using Google.");
+        user.setAbout(about);
 
-        User dbUser = userRepo.findByEmail(email).orElse(null);
+//        System.out.println(user);
 
+        User dbUser = repo.findByEmail(email).orElse(null);
         if(dbUser == null) {
             repo.save(user);
             logger.info("saved user: " + email);
@@ -96,6 +122,6 @@ public class OAuthGoogleSuccessHandler implements AuthenticationSuccessHandler {
         googleCookie.setMaxAge(0);
         response.addCookie(googleCookie);
 
-        response.sendRedirect("https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue="  + appClient + "/dashboard");
+        response.sendRedirect(redirectUrl);
     }
 }
