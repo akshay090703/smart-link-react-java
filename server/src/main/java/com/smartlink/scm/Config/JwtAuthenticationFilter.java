@@ -42,7 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if(jwt == null) {
+                throw new IllegalArgumentException("No Token in the request!");
+            }
+
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 String email = jwtUtil.extractEmail(jwt);
                 if (email != null && jwtUtil.isTokenValid(jwt, email)) {
                     User user = authService.getUserByEmail(email)
@@ -52,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    logger.info("Authentication successful for user: " + email);
+                    logger.info("Filter authentication successful for user: " + email);
                 }
             }
 
@@ -62,12 +66,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Unauthorized access\"}");
-            logger.warn("Authentication failed: " + e.getMessage() + " - IP: " + request.getRemoteAddr());
+            logger.warn("Filter authentication failed: " + e.getMessage() + " - IP: " + request.getRemoteAddr());
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"An unexpected error occurred\"}");
-            logger.error("Unexpected error during authentication", e);
+            logger.error("Unexpected error during filter authentication", e);
         }
     }
 }

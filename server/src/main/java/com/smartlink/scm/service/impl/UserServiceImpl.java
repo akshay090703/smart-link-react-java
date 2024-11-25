@@ -1,5 +1,6 @@
 package com.smartlink.scm.service.impl;
 
+import com.smartlink.scm.model.ProfileResponse;
 import com.smartlink.scm.model.User;
 import com.smartlink.scm.repo.UserRepo;
 import com.smartlink.scm.service.JwtUtil;
@@ -56,6 +57,22 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        ProfileResponse profileResponse = getProfileResponse(user.get());
+
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+    }
+
+    private static ProfileResponse getProfileResponse(User user) {
+        ProfileResponse profileResponse = new ProfileResponse();
+        profileResponse.setName(user.getName());
+        profileResponse.setEmail(user.getEmail());
+        profileResponse.setAbout(user.getAbout());
+        profileResponse.setProfilePic(user.getProfilePic());
+        profileResponse.setPhoneNumber(user.getPhoneNumber());
+        profileResponse.setEnabled(user.isEnabled());
+        profileResponse.setEmailVerified(user.isEmailVerified());
+        profileResponse.setPhoneVerified(user.isPhoneVerified());
+        profileResponse.setContacts(user.getContacts());
+        return profileResponse;
     }
 }

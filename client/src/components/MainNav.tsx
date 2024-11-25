@@ -6,9 +6,11 @@ import { MENU_OPTIONS } from "@/constants/menu";
 import { AxiosResponse } from "axios";
 import { apiClient } from "@/lib/api-client";
 import toast from "react-hot-toast";
+import { useProfile } from '../context/UserContext';
 
 const MainNav = () => {
     const navigate = useNavigate();
+    const { userProfile } = useProfile();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isNavbarOpen, setIsNavbarOpen] = useState(false); // State for the navbar menu
@@ -57,22 +59,8 @@ const MainNav = () => {
         }
     }
 
-    const profileInfo = async () => {
-        const res = await apiClient.get("/user/profile");
-
-        console.log(res);
-
-        if (res.status === 200) {
-            const data = res.data;
-            console.log(data);
-        } else if (res.status === 401) {
-            console.log("Unauthorized");
-        }
-
-    }
-
     return (
-        <nav className="dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800">
+        <nav className="dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800 md:pl-[14rem]">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 {/* Logo */}
                 <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -109,7 +97,7 @@ const MainNav = () => {
                         >
                             <span className="sr-only">Open user menu</span>
                             <div className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                                <svg
+                                {/* <svg
                                     className="absolute w-12 h-12 text-gray-400 -left-1"
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
@@ -120,7 +108,8 @@ const MainNav = () => {
                                         d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                                         clipRule="evenodd"
                                     ></path>
-                                </svg>
+                                </svg> */}
+                                <img src={userProfile?.profilePic} alt="Profile pic" />
                             </div>
                         </button>
 
@@ -130,21 +119,21 @@ const MainNav = () => {
                                 id="user-dropdown"
                             >
                                 <div className="px-4 py-3">
-                                    <span className="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
+                                    <span className="block text-sm text-gray-900 dark:text-white">{userProfile?.name}</span>
                                     <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                                        name@flowbite.com
+                                        {userProfile?.email}
                                     </span>
                                 </div>
                                 <ul className="py-2" aria-labelledby="user-menu-button">
 
                                     <li>
-                                        <div
-                                            onClick={profileInfo}
+                                        <Link
+                                            to={'/dashboard'}
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"
 
                                         >
                                             Dashboard
-                                        </div>
+                                        </Link>
                                         <div
                                             onClick={handleSignOut}
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"

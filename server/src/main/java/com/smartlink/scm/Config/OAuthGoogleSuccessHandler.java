@@ -65,7 +65,7 @@ public class OAuthGoogleSuccessHandler implements AuthenticationSuccessHandler {
             providerName = Providers.GOOGLE;
             about = "This user is created using Google.";
 
-            redirectUrl = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue="  + appClient + "/dashboard";
+//            redirectUrl = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue="  + appClient + "/dashboard";
         } else if(registrationId.equalsIgnoreCase("github")) {
             fullName = (String) attributes.get("name");
             email = (String) attributes.get("email");
