@@ -6,27 +6,34 @@ import MainLayout from "./layouts/main-nav-layout";
 import { Toaster } from "react-hot-toast"
 import DashboardPage from "./pages/dashboard/page";
 import { ProtectedRoute } from './layouts/ProtectedLayout';
+import ProfilePage from './pages/profile/page';
+import { UserContextProvider } from './context/UserContext';
+import AddContactPage from './pages/add-contact/page';
 
 const App = () => {
   return (
     <BrowserRouter>
-      <Toaster position="top-center" reverseOrder={false} />
+      <UserContextProvider>
+        <Toaster position="top-center" reverseOrder={false} />
 
-      <Routes>
-        <Route element={<RootLayout />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={
-            <ProtectedRoute isAuth={true}>
-              <AuthPage />
-            </ProtectedRoute>
-          } />
+        <Routes>
+          <Route element={<RootLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={
+              <ProtectedRoute isAuth={true}>
+                <AuthPage />
+              </ProtectedRoute>
+            } />
 
-          {/* Makes it a protected route sync with the backend */}
-          <Route element={<MainLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Makes it a protected route sync with the backend */}
+            <Route element={<MainLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/add-contact" element={<AddContactPage />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </UserContextProvider>
     </BrowserRouter>
   )
 }

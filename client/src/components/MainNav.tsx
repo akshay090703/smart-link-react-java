@@ -1,30 +1,30 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from "./Logo";
 import { useEffect, useRef, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
 import { MENU_OPTIONS } from "@/constants/menu";
-import { AxiosResponse } from "axios";
-import { apiClient } from "@/lib/api-client";
-import toast from "react-hot-toast";
+import DropDownUserMenu from "./DropDownUserMenu";
 import { useProfile } from '../context/UserContext';
+import { Button } from "./ui/button";
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const MainNav = () => {
-    const navigate = useNavigate();
-    const { userProfile } = useProfile();
-
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isNavbarOpen, setIsNavbarOpen] = useState(false); // State for the navbar menu
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const navDropdown = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
+    const { userProfile } = useProfile();
 
     const location = useLocation();
+    const navigate = useNavigate();
 
-    const handleClickOutside = (event: Event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-            setIsDropdownOpen(false);
-        }
-    };
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setScreenWidth(window.innerWidth);
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleClickOutsideNav = (event: Event) => {
         if (navDropdown.current && !navDropdown.current.contains(event.target as Node) && !buttonRef.current?.contains(event.target as Node)) {
@@ -33,34 +33,15 @@ const MainNav = () => {
     };
 
     useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("mousedown", handleClickOutsideNav);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("mousedown", handleClickOutsideNav);
         };
     }, []);
 
-    const handleSignOut = async () => {
-        try {
-            const res: AxiosResponse = await apiClient.get("/auth/logout");
-
-            // console.log(res);
-
-            if (res.status === 200) {
-                const data = res.data;
-                console.log(data);
-
-                navigate("/")
-                toast.success("User successfully Logged out!")
-            }
-        } catch (error) {
-            toast.error("There was some error");
-        }
-    }
-
     return (
-        <nav className="dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800 md:pl-[14rem]">
+        <nav className={`dark:bg-background border-b border-slate-200 bg-white shadow dark:border-slate-800 
+            }`}>
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 {/* Logo */}
                 <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -73,7 +54,7 @@ const MainNav = () => {
                         MENU_OPTIONS.map((option, index) => (
                             <Link
                                 to={option.to}
-                                className={`text-gray-900 dark:text-white p-2 rounded ${location.pathname === option.to ? "bg-blue-700 text-white" : "hover:bg-blue-700 hover:text-white"
+                                className={`text-gray-900 p-2 rounded dark:text-white ${location.pathname === option.to ? "bg-primary text-white dark:text-black" : "hover:bg-primary dark:hover:text-white text-black hover:text-white hover:dark:text-black"
                                     }`}
                                 key={index}
                             >
@@ -85,68 +66,13 @@ const MainNav = () => {
 
                 {/* User Dropdown and Mode Toggle */}
                 <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse gap-5">
+                    {
+                        screenWidth <= 768 && <SidebarTrigger />
+                    }
+
                     <ModeToggle />
                     {/* Dropdown menu */}
-                    <div className="relative" ref={dropdownRef}>
-                        <button
-                            type="button"
-                            className="flex text-sm bg-gray-800 rounded-full"
-                            id="user-menu-button"
-                            aria-expanded={isDropdownOpen}
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        >
-                            <span className="sr-only">Open user menu</span>
-                            <div className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                                {/* <svg
-                                    className="absolute w-12 h-12 text-gray-400 -left-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                        clipRule="evenodd"
-                                    ></path>
-                                </svg> */}
-                                <img src={userProfile?.profilePic} alt="Profile pic" />
-                            </div>
-                        </button>
-
-                        {isDropdownOpen && (
-                            <div
-                                className={`absolute right-0 mt-2 z-50 w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600`}
-                                id="user-dropdown"
-                            >
-                                <div className="px-4 py-3">
-                                    <span className="block text-sm text-gray-900 dark:text-white">{userProfile?.name}</span>
-                                    <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                                        {userProfile?.email}
-                                    </span>
-                                </div>
-                                <ul className="py-2" aria-labelledby="user-menu-button">
-
-                                    <li>
-                                        <Link
-                                            to={'/dashboard'}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"
-
-                                        >
-                                            Dashboard
-                                        </Link>
-                                        <div
-                                            onClick={handleSignOut}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white cursor-pointer"
-                                        >
-                                            Sign out
-                                        </div>
-                                    </li>
-
-
-                                </ul>
-                            </div>
-                        )}
-                    </div>
+                    {userProfile ? <DropDownUserMenu /> : <Button onClick={() => navigate("/auth")}>Login</Button>}
 
                     {/* Toggle Button for Navbar */}
                     <button

@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Navbar } from "@/components/navbar";
 import LoginForm from "./_components/LoginForm";
 import SignupForm from "./_components/SignupForm";
 import { GithubLoginButton } from "./_components/GithubLoginButton";
@@ -17,8 +16,6 @@ export default function AuthPage() {
 
     return (
         <div>
-            <Navbar />
-
             <div className="flex items-center justify-center min-h-[80vh] mt-2">
                 <Card className="w-full max-w-[27rem] lg:max-w-[30rem]">
                     <Tabs defaultValue="signin" className="w-full">

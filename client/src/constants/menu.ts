@@ -1,8 +1,8 @@
 export const MENU_OPTIONS = [
-  { title: "Home", to: "/home" },
+  { title: "Home", to: "/" },
   { title: "About", to: "/about" },
-  // { title: "Services", to: "/services" },
-  { title: "Contact", to: "/Contact" },
+  { title: "Services", to: "/services" },
+  // { title: "Contact", to: "/Contact" },
 ];
 
 export const USER_OPTIONS = [

@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/navbar";
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,8 +6,6 @@ import { Link } from "react-router-dom";
 export default function LandingPage() {
     return (
         <div className="flex h-screen flex-col">
-            <Navbar />
-
             <div className="flex-grow flex flex-col justify-center items-center text-center space-y-8 ">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
                     Manage contacts,{" "}
