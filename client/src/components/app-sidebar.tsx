@@ -1,4 +1,4 @@
-import { Home, ContactRound, PackagePlus, User2Icon } from "lucide-react"
+import { Home, ContactRound, User2Icon, PlusIcon } from "lucide-react"
 
 import {
     Sidebar,
@@ -24,7 +24,7 @@ const items = [
     {
         title: "Add Contact",
         url: "/add-contact",
-        icon: PackagePlus,
+        icon: PlusIcon,
     },
     {
         title: "All Contacts",

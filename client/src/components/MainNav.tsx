@@ -54,7 +54,7 @@ const MainNav = () => {
                         MENU_OPTIONS.map((option, index) => (
                             <Link
                                 to={option.to}
-                                className={`text-gray-900 p-2 rounded dark:text-white ${location.pathname === option.to ? "bg-primary text-white dark:text-black" : "hover:bg-primary dark:hover:text-white text-black hover:text-white hover:dark:text-black"
+                                className={`text-gray-900 p-2 rounded  ${location.pathname === option.to ? "bg-primary text-white dark:text-black" : "hover:bg-primary dark:hover:text-white text-black hover:text-white hover:dark:text-black dark:text-white"
                                     }`}
                                 key={index}
                             >

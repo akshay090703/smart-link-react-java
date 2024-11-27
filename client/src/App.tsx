@@ -9,6 +9,7 @@ import { ProtectedRoute } from './layouts/ProtectedLayout';
 import ProfilePage from './pages/profile/page';
 import { UserContextProvider } from './context/UserContext';
 import AddContactPage from './pages/add-contact/page';
+import ContactsPage from "./pages/contacts/page";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/add-contact" element={<AddContactPage />} />
+              <Route path="/contacts" element={<ContactsPage />} />
             </Route>
           </Route>
         </Routes>
