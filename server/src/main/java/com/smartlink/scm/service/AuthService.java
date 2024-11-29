@@ -21,4 +21,6 @@ public interface AuthService {
     ResponseEntity<?> loginUser(@Valid LoginForm form, HttpServletResponse response);
     public ResponseEntity<?> logoutUser(HttpServletResponse response);
     public ResponseEntity<?> isUserLoggedIn(HttpServletRequest request);
+
+    public Optional<User> getUserByEmail(String email);
 }

@@ -110,6 +110,7 @@ public class AuthServiceImpl implements AuthService {
         return Optional.of(userRepo.findAll());
     }
 
+    @Override
     public Optional<User> getUserByEmail(String email) {
         Optional<User> user = userRepo.findByEmail(email);
 

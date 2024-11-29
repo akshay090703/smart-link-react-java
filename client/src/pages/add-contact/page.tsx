@@ -1,9 +1,11 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ImageUpload } from './_components/ImageUpload';
 import { ContactFormFields } from './_components/ContactFormFields';
+import { apiClient } from '../../lib/api-client';
+import toast from 'react-hot-toast';
 
 interface ContactFormData {
     name: string;
@@ -14,7 +16,10 @@ interface ContactFormData {
     website: string;
     socialLink: string;
     isFavorite: boolean;
+    profilePhoto: string
 }
+
+const defaultImage = "https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png"
 
 const initialFormData: ContactFormData = {
     name: '',
@@ -25,16 +30,15 @@ const initialFormData: ContactFormData = {
     website: '',
     socialLink: '',
     isFavorite: false,
+    profilePhoto: defaultImage
 };
-
-const defaultImage = "https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png"
 
 const AddContactPage = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<ContactFormData>(initialFormData);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [profileImage, setProfileImage] = useState(defaultImage);
+    const [photo, setPhoto] = useState(defaultImage);
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -48,9 +52,9 @@ const AddContactPage = () => {
             newErrors.email = 'Valid email is required';
         }
 
-        const phoneRegex = /^\d{10,}$/;
+        const phoneRegex = /^\d{8,}$/;
         if (!phoneRegex.test(formData.phone)) {
-            newErrors.phone = 'Valid phone number is required (min 10 digits)';
+            newErrors.phone = 'Valid phone number is required (min 8 digits)';
         }
 
         if (!formData.address.trim()) {
@@ -74,12 +78,12 @@ const AddContactPage = () => {
 
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log('Form submitted:', { ...formData, profileImage });
-            // Reset form after successful submission
-            setFormData(initialFormData);
-            setProfileImage('/placeholder-avatar.jpg');
+            const res = await apiClient.post("/user/contacts/add", formData);
+
+            console.log(res);
+            toast.success("Contact successfully created!")
+
+            handleReset()
         } catch (error) {
             console.error('Error submitting form:', error);
         } finally {
@@ -87,11 +91,15 @@ const AddContactPage = () => {
         }
     };
 
+    useEffect(() => {
+        setFormData(prev => ({ ...prev, profilePhoto: photo }));
+    }, [photo])
+
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const imageUrl = URL.createObjectURL(file);
-            setProfileImage(imageUrl);
+            setPhoto(imageUrl);
         }
     };
 
@@ -108,7 +116,7 @@ const AddContactPage = () => {
 
     const handleReset = () => {
         setFormData(initialFormData);
-        setProfileImage(defaultImage);
+        setPhoto(defaultImage);
         setErrors({});
     };
 
@@ -130,7 +138,7 @@ const AddContactPage = () => {
                     <div className="flex flex-col md:flex-row gap-8">
                         <div className="flex-shrink-0">
                             <ImageUpload
-                                imageUrl={profileImage}
+                                imageUrl={photo}
                                 onImageChange={handleImageChange}
                             />
                         </div>
