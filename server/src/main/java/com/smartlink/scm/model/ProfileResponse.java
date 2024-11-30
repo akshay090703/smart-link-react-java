@@ -29,5 +29,5 @@ public class ProfileResponse {
     private boolean emailVerified = false;
     private boolean phoneVerified = false;
 
-    private List<Contact> contacts = new ArrayList<>();
+//    private List<Contact> contacts = new ArrayList<>();
 }

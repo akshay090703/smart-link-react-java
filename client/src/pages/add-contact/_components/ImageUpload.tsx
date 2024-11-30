@@ -2,7 +2,7 @@ import { ChangeEvent, useRef } from 'react';
 import { Plus } from 'lucide-react';
 
 interface ImageUploadProps {
-    imageUrl: string;
+    imageUrl: string | File;
     onImageChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -13,10 +13,12 @@ export function ImageUpload({ imageUrl, onImageChange }: ImageUploadProps) {
         fileInputRef.current?.click();
     };
 
+    const previewUrl = typeof imageUrl === 'string' ? imageUrl : URL.createObjectURL(imageUrl)
+
     return (
         <div className="relative w-48 h-48 group">
             <img
-                src={imageUrl}
+                src={previewUrl}
                 alt="Profile photo"
                 className="w-full h-full object-cover rounded-full shadow-md"
             />

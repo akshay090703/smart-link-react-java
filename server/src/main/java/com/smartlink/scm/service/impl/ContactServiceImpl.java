@@ -8,7 +8,10 @@ import com.smartlink.scm.model.User;
 import com.smartlink.scm.repo.ContactRepo;
 import com.smartlink.scm.service.AuthService;
 import com.smartlink.scm.service.ContactService;
+import com.smartlink.scm.service.ImageService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,11 @@ public class ContactServiceImpl implements ContactService {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ImageService imageService;
+
+    private Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
+
     @Override
     public Contact createContact(ContactForm contact, HttpServletRequest request) {
         String contactId = UUID.randomUUID().toString();
@@ -33,6 +41,10 @@ public class ContactServiceImpl implements ContactService {
         String userEmail = tokenUtil.getEmailFromJwt(request);
 
         User user = authService.getUserByEmail(userEmail).orElse(null);
+
+//        logger.info("Photo information: {}", contact.getProfilePhoto().getOriginalFilename());
+
+        String fileUrl = imageService.uploadImage(contact.getContactPhoto());
 
         Contact newContact = new Contact();
         newContact.setId(contactId);
@@ -44,9 +56,10 @@ public class ContactServiceImpl implements ContactService {
         newContact.setWebsiteLink(contact.getWebsite());
         newContact.setLinkedinLink(contact.getSocialLink());
         newContact.setFavorite(contact.getIsFavorite());
-        newContact.setPicture(contact.getProfilePhoto());
+        newContact.setPicture(fileUrl);
         newContact.setUser(user);
 
+//        return null;
         return contactRepo.save(newContact);
     }
 

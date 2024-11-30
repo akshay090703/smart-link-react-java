@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
         profileResponse.setEnabled(user.isEnabled());
         profileResponse.setEmailVerified(user.isEmailVerified());
         profileResponse.setPhoneVerified(user.isPhoneVerified());
-        profileResponse.setContacts(user.getContacts());
+//        profileResponse.setContacts(user.getContacts());
         return profileResponse;
     }
 }

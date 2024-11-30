@@ -1,5 +1,6 @@
 package com.smartlink.scm.controller;
 
+import com.smartlink.scm.service.UserService;
 import com.smartlink.scm.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @GetMapping("/dashboard")
     public ResponseEntity<String> dashboard() {

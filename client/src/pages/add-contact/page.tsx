@@ -16,7 +16,7 @@ interface ContactFormData {
     website: string;
     socialLink: string;
     isFavorite: boolean;
-    profilePhoto: string
+    profilePhoto: File | null
 }
 
 const defaultImage = "https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png"
@@ -30,7 +30,7 @@ const initialFormData: ContactFormData = {
     website: '',
     socialLink: '',
     isFavorite: false,
-    profilePhoto: defaultImage
+    profilePhoto: null
 };
 
 const AddContactPage = () => {
@@ -38,7 +38,7 @@ const AddContactPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<ContactFormData>(initialFormData);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [photo, setPhoto] = useState(defaultImage);
+    const [photo, setPhoto] = useState<string | File>(defaultImage);
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -78,7 +78,17 @@ const AddContactPage = () => {
 
         setIsLoading(true);
         try {
-            const res = await apiClient.post("/user/contacts/add", formData);
+            const dataToSend = new FormData();
+
+            Object.entries(formData).forEach(([key, value]) => {
+                dataToSend.append(key, value);
+            })
+
+            const res = await apiClient.post("/user/contacts/add", dataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
             console.log(res);
             toast.success("Contact successfully created!")
@@ -92,14 +102,21 @@ const AddContactPage = () => {
     };
 
     useEffect(() => {
-        setFormData(prev => ({ ...prev, profilePhoto: photo }));
+        if (photo instanceof File) {
+            setFormData(prev => ({ ...prev, profilePhoto: photo }));
+        }
     }, [photo])
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setPhoto(imageUrl);
+            const maxSizeInBytes = 7 * 1024 * 1024; // 7 MB
+            if (file.size > maxSizeInBytes) {
+                toast.error("Photo size should be less than 7 MB");
+                return;
+            }
+
+            setPhoto(file);
         }
     };
 
