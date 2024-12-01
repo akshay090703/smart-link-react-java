@@ -134,7 +134,7 @@ const SignupForm = () => {
                 toast.success("Account created successfully!");
             }
         } catch (error) {
-            toast.error("Credentials did not match!");
+            toast.error("Error creating the account!");
             console.error(error);
         } finally {
             setTimeout(() => {

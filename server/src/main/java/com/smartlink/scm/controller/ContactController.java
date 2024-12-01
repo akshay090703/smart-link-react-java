@@ -23,6 +23,8 @@ public class ContactController {
             return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
 
+//        System.out.println(contactForm);
+
         Contact createdContact = contactService.createContact(contactForm, request);
 
         return new ResponseEntity<>(createdContact, HttpStatus.CREATED);

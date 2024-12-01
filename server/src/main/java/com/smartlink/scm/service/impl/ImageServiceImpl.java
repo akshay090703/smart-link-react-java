@@ -21,9 +21,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public String uploadImage(MultipartFile file) {
-        String fileName = UUID.randomUUID().toString();
-
+    public String uploadImage(MultipartFile file, String fileName) {
         try {
             byte[] data = new byte[file.getInputStream().available()];
 
@@ -34,8 +32,7 @@ public class ImageServiceImpl implements ImageService {
 
             return this.getUrlFromPublicId(fileName);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("Failed to upload image to Cloudinary", e);
         }
     }
 

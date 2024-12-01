@@ -29,6 +29,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String requestPath = request.getServletPath();
+
+        if (requestPath.startsWith("/auth/") || requestPath.startsWith("/oauth2/") || requestPath.equals("/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        System.out.println("JWT Filter triggered for: " + request.getRequestURI());
+
         try {
             Cookie[] cookies = request.getCookies();
             String jwt = null;

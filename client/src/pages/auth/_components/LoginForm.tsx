@@ -7,9 +7,11 @@ import { apiClient } from "@/lib/api-client";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/LoadingButton";
+import { useProfile } from '../../../context/UserContext';
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const { getProfileInfo } = useProfile();
     const [isLoading, setIsLoading] = useState(false);
 
     const [loginEmail, setLoginEmail] = useState("");
@@ -80,6 +82,8 @@ const LoginForm = () => {
             const res: AxiosResponse = await apiClient.post("/auth/login", { loginEmail, loginPassword })
 
             if (res.status === 200) {
+                getProfileInfo();
+
                 // const data = res.data;
                 // console.log(data);
                 toast.success("Logged in successfully!");

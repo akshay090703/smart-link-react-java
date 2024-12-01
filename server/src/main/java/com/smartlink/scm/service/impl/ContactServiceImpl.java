@@ -43,8 +43,9 @@ public class ContactServiceImpl implements ContactService {
         User user = authService.getUserByEmail(userEmail).orElse(null);
 
 //        logger.info("Photo information: {}", contact.getProfilePhoto().getOriginalFilename());
+        String publicId = UUID.randomUUID().toString();
 
-        String fileUrl = imageService.uploadImage(contact.getContactPhoto());
+        String fileUrl = imageService.uploadImage(contact.getContactPhoto(), publicId);
 
         Contact newContact = new Contact();
         newContact.setId(contactId);
@@ -56,8 +57,9 @@ public class ContactServiceImpl implements ContactService {
         newContact.setWebsiteLink(contact.getWebsite());
         newContact.setLinkedinLink(contact.getSocialLink());
         newContact.setFavorite(contact.getIsFavorite());
-        newContact.setPicture(fileUrl);
         newContact.setUser(user);
+        newContact.setPicture(fileUrl);
+        newContact.setCloudinaryImagePublicId(publicId);
 
 //        return null;
         return contactRepo.save(newContact);

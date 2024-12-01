@@ -16,7 +16,7 @@ interface ContactFormData {
     website: string;
     socialLink: string;
     isFavorite: boolean;
-    profilePhoto: File | null
+    contactPhoto: File | null
 }
 
 const defaultImage = "https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png"
@@ -30,7 +30,7 @@ const initialFormData: ContactFormData = {
     website: '',
     socialLink: '',
     isFavorite: false,
-    profilePhoto: null
+    contactPhoto: null
 };
 
 const AddContactPage = () => {
@@ -103,7 +103,7 @@ const AddContactPage = () => {
 
     useEffect(() => {
         if (photo instanceof File) {
-            setFormData(prev => ({ ...prev, profilePhoto: photo }));
+            setFormData(prev => ({ ...prev, contactPhoto: photo }));
         }
     }, [photo])
 
