@@ -112,9 +112,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        Optional<User> user = userRepo.findByEmail(email);
 
-        return user;
+        return userRepo.findByEmail(email);
     }
 
     public ResponseEntity<?> loginUser(LoginForm form, HttpServletResponse response) {

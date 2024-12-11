@@ -28,7 +28,7 @@ const items = [
     },
     {
         title: "All Contacts",
-        url: "/contacts",
+        url: "/contacts?page=0&size=10&sortBy=name&order=asc",
         icon: ContactRound,
     },
     {

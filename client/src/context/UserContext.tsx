@@ -34,7 +34,7 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (res.status === 200) {
             const data = res.data;
 
-            console.log(data);
+            // console.log(data);
 
 
             setUserProfile(data);

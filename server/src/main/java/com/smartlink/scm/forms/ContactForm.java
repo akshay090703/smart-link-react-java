@@ -1,5 +1,6 @@
 package com.smartlink.scm.forms;
 
+import com.smartlink.scm.validators.ValidFile;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -29,5 +30,6 @@ public class ContactForm {
     private String socialLink;
     private Boolean isFavorite;
 
+    @ValidFile(message = "Invalid File")
     private MultipartFile contactPhoto;
 }
