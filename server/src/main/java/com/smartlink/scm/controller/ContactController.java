@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -60,6 +61,17 @@ public class ContactController {
 
         Page<Contact> contactsList = contactService.getByUser(userByEmail.get(), page, size, sortBy, order);
 
-        return new ResponseEntity<>(contactsList, HttpStatus.OK);
+        return new ResponseEntity<>(Map.of(
+                "contacts", contactsList,
+                "totalPages", contactsList.getTotalPages(),
+                "currentPage", contactsList.getNumber()
+        ), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchContacts() {
+              
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
