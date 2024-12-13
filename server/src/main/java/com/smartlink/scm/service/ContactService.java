@@ -20,7 +20,11 @@ public interface ContactService {
 
     List<Contact> getAll();
 
-    List<Contact> searchContact(String name, String email, String phoneNumber);
+    Page<Contact> searchByName(String name, int size, int page, String sortBy, String order);
+
+    Page<Contact> searchByEmail(String email, int size, int page, String sortBy, String order);
+
+    Page<Contact> searchByPhone(String phone, int size, int page, String sortBy, String order);
 
     List<Contact> getByUserId(String userId);
 

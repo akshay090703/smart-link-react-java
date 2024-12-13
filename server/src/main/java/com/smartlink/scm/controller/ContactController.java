@@ -9,6 +9,8 @@ import com.smartlink.scm.service.ContactService;
 import com.smartlink.scm.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -32,6 +35,8 @@ public class ContactController {
     @Autowired
     private TokenUtil tokenUtil;
 
+    private Logger logger = LoggerFactory.getLogger(ContactController.class);
+
     @PostMapping("/add")
     public ResponseEntity<?> addContact(HttpServletRequest request, @Valid @ModelAttribute ContactForm contactForm, BindingResult result) {
         if(result.hasErrors()) {
@@ -45,7 +50,6 @@ public class ContactController {
         return new ResponseEntity<>(createdContact, HttpStatus.CREATED);
     }
 
-    @GetMapping("")
     public ResponseEntity<?> getAllContacts(HttpServletRequest request, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size, @RequestParam(value = "sortBy", defaultValue = "name") String sortBy, @RequestParam(value = "order", defaultValue = "asc") String order) {
         String email = tokenUtil.getEmailFromJwt(request);
 
@@ -61,17 +65,33 @@ public class ContactController {
 
         Page<Contact> contactsList = contactService.getByUser(userByEmail.get(), page, size, sortBy, order);
 
-        return new ResponseEntity<>(Map.of(
-                "contacts", contactsList,
-                "totalPages", contactsList.getTotalPages(),
-                "currentPage", contactsList.getNumber()
-        ), HttpStatus.OK);
+//        return new ResponseEntity<>(Map.of(
+//                "contacts", contactsList,
+//                "totalPages", contactsList.getTotalPages(),
+//                "currentPage", contactsList.getNumber()
+//        ), HttpStatus.OK);
+        return new ResponseEntity<>(contactsList, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchContacts() {
-              
+    public ResponseEntity<?> searchContacts(@RequestParam("selectedCategory") String field, @RequestParam("searchText") String value, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size, @RequestParam(value = "sortBy", defaultValue = "name") String sortBy, @RequestParam(value = "order", defaultValue = "asc") String order, HttpServletRequest request) {
+        if(field.isEmpty()) {
+            return getAllContacts(request, page, size, sortBy, order);
+        }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        logger.info("field {} value {}", field, value);
+
+        Page<Contact> contacts = null;
+        System.out.println(size);
+
+        if(field.equalsIgnoreCase("name")) {
+            contacts = contactService.searchByName(value, size, page, sortBy, order);
+        } else if(field.equalsIgnoreCase("email")) {
+            contacts = contactService.searchByEmail(value, size, page, sortBy, order);
+        } else if(field.equalsIgnoreCase("phoneNumber")) {
+            contacts = contactService.searchByPhone(value, size, page, sortBy, order);
+        }
+
+        return new ResponseEntity<>(contacts, HttpStatus.OK);
     }
 }

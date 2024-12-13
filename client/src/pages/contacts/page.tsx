@@ -1,9 +1,9 @@
 import { SkeletonCard } from "@/components/SkeletonCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from 'react';
 import { apiClient } from "../../lib/api-client";
 import toast from "react-hot-toast";
 import { ContactsTable } from "./_components/ContactsTable";
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Pagination,
     PaginationContent,
@@ -44,53 +44,46 @@ const ContactsPage = () => {
     const [loading, setLoading] = useState(false);
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const [totalPages, setTotalPages] = useState(0);
     const [currPage, setCurrPage] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
 
     const page = Number(searchParams.get("page") || 0);
     const size = Number(searchParams.get("size") || 10);
     const sortBy = searchParams.get("sortBy") || "name";
     const order = searchParams.get("order") || "asc";
 
-    const [searchLoading, setSearchLoading] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [searchText, setSearchText] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
+    const [searchText, setSearchText] = useState(searchParams.get("keyword") || "");
 
-    const onSearch = () => {
-        setSearchLoading(true)
-        setTimeout(() => {
-            console.log(selectedCategory + " " + searchText);
+    const onSearch = async () => {
+        setLoading(true)
 
-            setSearchLoading(false)
-        }, 1000)
+        try {
+            const res = await apiClient.get('/user/contacts/search', {
+                params: { selectedCategory, searchText, page, size, sortBy, order }
+            })
+
+            if (res.status === 200) {
+                // console.log(res.data);
+                setContacts(res?.data?.content)
+                setCurrPage(res?.data?.number);
+                setTotalPages(res?.data?.totalPages)
+                setTotalElements(res?.data?.totalElements)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("There was an error searching the contacts!")
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
-        const getAllContacts = async () => {
-            setLoading(true);
-            try {
-                const res = await apiClient.get("/user/contacts", {
-                    params: { page, size, sortBy, order }
-                });
-
-                // console.log(res.data);
-
-                if (res.status === 200) {
-                    setContacts(res?.data?.contacts?.content);
-                    setTotalPages(res?.data?.totalPages)
-                    setCurrPage(res?.data?.currentPage)
-                }
-            } catch (error) {
-                console.error(error);
-                toast.error("There was an error fetching the contacts");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getAllContacts();
-    }, [page, size, sortBy, order]);
+        onSearch();
+    }, [page, size, sortBy, order])
 
     const updateUrlParams = (updatedParams: Record<string, string | number>) => {
         const newParams = {
@@ -103,12 +96,15 @@ const ContactsPage = () => {
         setSearchParams(newParams);
     };
 
-    return loading ? (
-        <SkeletonCard />
-    ) : (
+    const onSubmitForm = (e: FormEvent) => {
+        e.preventDefault();
+        onSearch();
+    }
+
+    return (
         <div className="flex flex-col px-4 py-3 pt-5 gap-4">
-            <div className="flex gap-4 ml-auto">
-                <Select onValueChange={(val) => setSelectedCategory(val)}>
+            <form onSubmit={onSubmitForm} className="flex gap-4 ml-auto">
+                <Select value={selectedCategory} onValueChange={(val) => setSelectedCategory(val)}>
                     <SelectTrigger className="w-[200px]">
                         <SelectValue placeholder="Category to search" />
                     </SelectTrigger>
@@ -133,17 +129,29 @@ const ContactsPage = () => {
                     <SearchIcon className="absolute left-3 top-[45%] transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 </div>
 
-                <LoadingButton loading={searchLoading} onClick={onSearch}>Search</LoadingButton>
-            </div>
-            <div className="flex-grow overflow-auto">
-                {
-                    contacts.length ?
-                        <ContactsTable contacts={contacts} setContacts={setContacts} /> :
-                        <div className="flex justify-center items-center h-[20vh]">
-                            <p>No contacts found!</p>
+                <LoadingButton loading={loading} disabled={loading} className="disabled:cursor-not-allowed" onClick={onSearch}>Search</LoadingButton>
+            </form>
+
+            {
+                loading ? <SkeletonCard />
+                    :
+                    <div className="flex flex-col gap-3">
+                        <p className="leading-7 [&:not(:first-child)]:mt-1 text-center">
+                            Total {totalElements} {totalElements == 1 ? "contact" : "contacts"} found!
+                        </p>
+
+                        <div className="flex-grow overflow-auto">
+                            {
+                                contacts.length > 0 ?
+                                    <ContactsTable contacts={contacts} setContacts={setContacts} /> :
+                                    <div className="flex justify-center items-center h-[20vh] gap-2">
+                                        <p>No contacts found!</p>
+                                        <div onClick={() => navigate('/dashboard')} className="underline cursor-pointer">Back to Dashboard</div>
+                                    </div>
+                            }
                         </div>
-                }
-            </div>
+                    </div>
+            }
             <div className="flex justify-between items-center">
                 <Pagination>
                     <PaginationContent>
@@ -170,8 +178,8 @@ const ContactsPage = () => {
                             <PaginationEllipsis />
                         </PaginationItem>
                         <PaginationItem>
-                            <PaginationNext onClick={() => page < totalPages - 1 && updateUrlParams({ page: page + 1 })}
-                                className={`${page === totalPages - 1 ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                            <PaginationNext onClick={() => page !== totalPages - 1 && totalPages !== 0 && updateUrlParams({ page: page + 1 })}
+                                className={`${page === totalPages - 1 || totalPages == 0 ? "cursor-not-allowed opacity-50" : "cursor-pointer"
                                     }`}
                             />
                         </PaginationItem>
