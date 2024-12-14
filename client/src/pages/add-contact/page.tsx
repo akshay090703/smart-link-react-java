@@ -65,6 +65,10 @@ const AddContactPage = () => {
             newErrors.website = 'Valid website URL is required';
         }
 
+        if (formData.socialLink && !/^https?:\/\/.+/.test(formData.socialLink)) {
+            newErrors.socialLink = 'Valid website URL is required';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ContactService {
     Contact createContact(ContactForm contact, HttpServletRequest request);
@@ -29,4 +30,6 @@ public interface ContactService {
     List<Contact> getByUserId(String userId);
 
     Page<Contact> getByUser(User user, int page, int size, String sortBy, String order);
+
+    Optional<Contact> getContactById(String contactId);
 }

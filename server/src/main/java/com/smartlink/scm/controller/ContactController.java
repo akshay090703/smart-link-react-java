@@ -82,7 +82,7 @@ public class ContactController {
         logger.info("field {} value {}", field, value);
 
         Page<Contact> contacts = null;
-        System.out.println(size);
+//        System.out.println(size);
 
         if(field.equalsIgnoreCase("name")) {
             contacts = contactService.searchByName(value, size, page, sortBy, order);
@@ -94,4 +94,16 @@ public class ContactController {
 
         return new ResponseEntity<>(contacts, HttpStatus.OK);
     }
+
+    @GetMapping("/{contactId}")
+    public ResponseEntity<?> getContact(@PathVariable String contactId) {
+        Optional<Contact> contact = contactService.getContactById(contactId);
+
+        if(contact.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(contact.get(), HttpStatus.OK);
+    }
 }
+

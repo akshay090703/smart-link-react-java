@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -128,5 +129,10 @@ public class ContactServiceImpl implements ContactService {
         var pageable = PageRequest.of(page, size, sort);
 
         return contactRepo.findByUser(user, pageable);
+    }
+
+    @Override
+    public Optional<Contact> getContactById(String contactId) {
+        return contactRepo.findById(contactId);
     }
 }

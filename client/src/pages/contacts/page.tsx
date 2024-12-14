@@ -25,20 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from '@/components/LoadingButton';
 import { SearchIcon } from "lucide-react";
-
-export interface Contact {
-    id: string;
-    name: string;
-    email: string;
-    picture?: string;
-    phoneNumber: string;
-    websiteLink?: string;
-    linkedinLink?: string;
-    favorite?: boolean;
-    description?: string;
-    address?: string;
-    cloudinaryImagePublicId?: string;
-}
+import { Contact } from "./view/_components/types";
 
 const ContactsPage = () => {
     const [loading, setLoading] = useState(false);
