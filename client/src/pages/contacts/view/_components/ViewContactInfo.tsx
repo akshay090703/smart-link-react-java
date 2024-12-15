@@ -60,6 +60,7 @@ export function ViewContactInfo({ contact }: ViewContactInfoProps) {
                         icon={<Globe className="h-4 w-4" />}
                         label="Website"
                         value={contact.websiteLink}
+                        isLink
                     />
                 )}
                 {contact.linkedinLink && (
@@ -67,6 +68,7 @@ export function ViewContactInfo({ contact }: ViewContactInfoProps) {
                         icon={<Linkedin className="h-4 w-4" />}
                         label="LinkedIn"
                         value={contact.linkedinLink}
+                        isLink
                     />
                 )}
             </div>
