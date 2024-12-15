@@ -39,7 +39,12 @@ public class ContactController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addContact(HttpServletRequest request, @Valid @ModelAttribute ContactForm contactForm, BindingResult result) {
+//        System.out.println(contactForm);
+
+//        System.out.println(result);
+
         if(result.hasErrors()) {
+//            System.out.println("sdfdsfds");
             return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
 
@@ -104,6 +109,11 @@ public class ContactController {
         }
 
         return new ResponseEntity<>(contact.get(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteContact(@PathVariable String id) {
+        return contactService.deleteContact(id);
     }
 }
 

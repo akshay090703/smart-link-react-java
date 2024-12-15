@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +52,7 @@ public class ContactServiceImpl implements ContactService {
 //        logger.info("Photo information: {}", contact.getProfilePhoto().getOriginalFilename());
         String publicId = UUID.randomUUID().toString();
 
-        String fileUrl = imageService.uploadImage(contact.getContactPhoto(), publicId);
+        String fileUrl = contact.getContactPhoto() == null || contact.getContactPhoto().isEmpty() ? "https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png" : imageService.uploadImage(contact.getContactPhoto(), publicId);
 
         Contact newContact = new Contact();
         newContact.setId(contactId);
@@ -66,7 +68,6 @@ public class ContactServiceImpl implements ContactService {
         newContact.setPicture(fileUrl);
         newContact.setCloudinaryImagePublicId(publicId);
 
-//        return null;
         return contactRepo.save(newContact);
     }
 
@@ -76,10 +77,15 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteContact(String contactId) {
-        Contact contact = contactRepo.findById(contactId).orElseThrow(() -> new ResourceNotFoundException("Contact not found with id: " + contactId));
+    public ResponseEntity<?> deleteContact(String contactId) {
+        Optional<Contact> contact = contactRepo.findById(contactId);
 
-        contactRepo.delete(contact);
+        if(contact.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        contactRepo.delete(contact.get());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override

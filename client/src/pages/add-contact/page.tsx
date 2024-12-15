@@ -85,7 +85,11 @@ const AddContactPage = () => {
             const dataToSend = new FormData();
 
             Object.entries(formData).forEach(([key, value]) => {
-                dataToSend.append(key, value);
+                if (key == "contactPhoto" && value == null) {
+
+                } else {
+                    dataToSend.append(key, value);
+                }
             })
 
             const res = await apiClient.post("/user/contacts/add", dataToSend, {
@@ -94,12 +98,13 @@ const AddContactPage = () => {
                 },
             });
 
-            console.log(res);
-            toast.success("Contact successfully created!")
-
-            handleReset()
+            if (res.status === 201) {
+                toast.success("Contact successfully created!")
+                handleReset()
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
+            toast.error("Error saving the contact!")
         } finally {
             setIsLoading(false);
         }

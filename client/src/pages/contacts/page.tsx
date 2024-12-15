@@ -54,7 +54,6 @@ const ContactsPage = () => {
             })
 
             if (res.status === 200) {
-                // console.log(res.data);
                 setContacts(res?.data?.content)
                 setCurrPage(res?.data?.number);
                 setTotalPages(res?.data?.totalPages)
@@ -130,7 +129,9 @@ const ContactsPage = () => {
                         <div className="flex-grow overflow-auto">
                             {
                                 contacts.length > 0 ?
-                                    <ContactsTable contacts={contacts} setContacts={setContacts} /> :
+                                    <ContactsTable contacts={contacts}
+                                        onSearch={onSearch}
+                                    /> :
                                     <div className="flex justify-center items-center h-[20vh] gap-2">
                                         <p>No contacts found!</p>
                                         <div onClick={() => navigate('/dashboard')} className="underline cursor-pointer">Back to Dashboard</div>

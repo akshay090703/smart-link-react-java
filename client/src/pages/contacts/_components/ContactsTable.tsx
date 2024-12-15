@@ -14,17 +14,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Copy, ExternalLink, Eye, Link2, Linkedin, MoreVertical, Pen } from "lucide-react";
+import { Copy, Eye, Link2, Linkedin, MoreVertical, Pen, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Contact } from "../view/_components/types";
 import { ContactModal } from "../view/ContactModal";
 import { useState } from 'react';
 import { apiClient } from '../../../lib/api-client';
-import DeleteModal from "../view/_components/ContactDeleteModal";
+import DeleteContactModal from "../view/_components/ContactDeleteModal";
+import { ViewContactModal } from "../view/_components/ViewContactModal";
 
 interface ContactsTableProps {
     contacts: Contact[]; // Required list of contacts
-    setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
+    onSearch: () => void;
 }
 
 const initialContact = {
@@ -41,19 +42,19 @@ const initialContact = {
     cloudinaryImagePublicId: ""
 }
 
-export function ContactsTable({ contacts }: ContactsTableProps) {
+export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [viewModal, setViewModal] = useState(false);
+
+    const [contactName, setContactName] = useState("");
+
     const [contact, setContact] = useState<Contact>(initialContact);
     const [isUpdate, setIsUpdate] = useState(false);
     const [selectedContact, setSelectedContact] = useState("");
 
     const onModalClose = () => {
         setIsModalOpen(false)
-    }
-
-    const onDeleteModalClose = () => {
-        setIsDeleteModalOpen(false)
     }
 
     const copyToClipboard = async (text: string) => {
@@ -66,20 +67,14 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
             console.error("Failed to copy text: ", err);
         }
     };
-
-    const deleteContact = () => {
-        console.log(selectedContact);
-
-        setIsDeleteModalOpen(false);
-    };
     const updateContact = (id: string) => {
-        setIsUpdate(false);
+        setIsUpdate(true);
 
         getContactInfo(id);
     }
 
     const viewContact = (id: string) => {
-        setIsUpdate(true);
+        setIsUpdate(false);
 
         getContactInfo(id);
     }
@@ -90,7 +85,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
 
             if (res.status === 200) {
                 setContact(res?.data);
-                setIsModalOpen(true);
+                isUpdate ? setIsModalOpen(true) : setViewModal(true);
             }
         } catch (error) {
             console.error(error);
@@ -191,11 +186,12 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                                             <DropdownMenuItem
                                                 onClick={() => {
                                                     setSelectedContact(contact.id);
+                                                    setContactName(contact.name)
                                                     setIsDeleteModalOpen(true)
                                                 }}
                                                 className="gap-2 text-destructive"
                                             >
-                                                <ExternalLink className="h-4 w-4" />
+                                                <Trash2 className="h-4 w-4" />
                                                 <span>Delete</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
@@ -208,9 +204,14 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
 
 
             </div>
-            <ContactModal contact={contact} disabled={isUpdate} isOpen={isModalOpen} onClose={onModalClose} />
+            <ContactModal contact={contact} disabled={false} isOpen={isModalOpen} onClose={onModalClose} />
 
-            <DeleteModal isOpen={isDeleteModalOpen} onDelete={deleteContact} onClose={onDeleteModalClose} />
+            <ViewContactModal contact={contact} isOpen={viewModal} onClose={() => setViewModal(false)} onSearch={onSearch} />
+
+            <DeleteContactModal contactName={contactName} isOpen={isDeleteModalOpen} onClose={() => {
+                setTimeout(() => (document.body.style.pointerEvents = ""), 300)
+                setIsDeleteModalOpen(false);
+            }} id={selectedContact} onSearch={onSearch} />
         </div>
     );
 }

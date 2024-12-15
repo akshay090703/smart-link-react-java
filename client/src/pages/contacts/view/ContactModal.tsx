@@ -4,6 +4,7 @@ import { ContactForm } from "./_components/ContactForm";
 import { Contact } from "./_components/types";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from 'react';
 
 interface ContactModalProps {
     contact: Contact;
@@ -20,13 +21,19 @@ export function ContactModal({
     disabled = true,
     onSave = () => { },
 }: ContactModalProps) {
+    const [previewImage, setPreviewImage] = useState(contact.picture);
+
+    useEffect(() => {
+        setPreviewImage(contact.picture);
+    }, [contact])
+
     const handleImageChange = (file: File) => {
         const picture = URL.createObjectURL(file);
-        onSave({ ...contact, picture });
+        setPreviewImage(picture);
     };
 
     const handleFormSubmit = (data: Omit<Contact, "id" | "picture">) => {
-        onSave({ ...contact, ...data });
+        onSave({ ...contact, ...data, picture: previewImage });
         onClose();
     };
 
@@ -46,7 +53,7 @@ export function ContactModal({
                                 <div className="relative">
                                     <div className="sticky top-6">
                                         <ContactImageUpload
-                                            imageUrl={contact.picture}
+                                            imageUrl={previewImage}
                                             disabled={disabled}
                                             onImageChange={handleImageChange}
                                         />
