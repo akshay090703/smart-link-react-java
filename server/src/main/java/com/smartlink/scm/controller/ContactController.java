@@ -115,5 +115,10 @@ public class ContactController {
     public ResponseEntity<?> deleteContact(@PathVariable String id) {
         return contactService.deleteContact(id);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateContact(@PathVariable String id, @RequestBody ContactForm contactForm, BindingResult result) {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 
