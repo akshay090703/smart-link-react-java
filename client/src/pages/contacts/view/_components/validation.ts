@@ -1,6 +1,6 @@
-import { FormData, FormErrors } from "./types";
+import { FormErrors, ContactFormData } from "./types";
 
-export const validateForm = (formData: FormData): FormErrors => {
+export const validateForm = (formData: ContactFormData): FormErrors => {
   const errors: FormErrors = {};
 
   if (!formData.name.trim()) {
@@ -13,7 +13,7 @@ export const validateForm = (formData: FormData): FormErrors => {
   }
 
   const phoneRegex = /^\d{8,}$/;
-  if (!phoneRegex.test(formData.phoneNumber.replace(/\D/g, ""))) {
+  if (!phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
     errors.phoneNumber = "Valid phone number is required (min 8 digits)";
   }
 
@@ -21,11 +21,11 @@ export const validateForm = (formData: FormData): FormErrors => {
     errors.address = "Address is required";
   }
 
-  if (formData.websiteLink && !/^https?:\/\/.+/.test(formData.websiteLink)) {
+  if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
     errors.websiteLink = "Valid website URL is required";
   }
 
-  if (formData.linkedinLink && !/^https?:\/\/.+/.test(formData.linkedinLink)) {
+  if (formData.socialLink && !/^https?:\/\/.+/.test(formData.socialLink)) {
     errors.linkedInLink = "Valid LinkedIn URL is required";
   }
 

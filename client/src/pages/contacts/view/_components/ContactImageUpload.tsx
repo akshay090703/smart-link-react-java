@@ -5,13 +5,13 @@ import { ChangeEvent } from "react";
 interface ContactImageUploadProps {
     imageUrl: string;
     disabled?: boolean;
-    onImageChange: (file: File) => void;
+    onImageChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export function ContactImageUpload({ imageUrl, disabled, onImageChange }: ContactImageUploadProps) {
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            onImageChange(e.target.files[0]);
+            onImageChange(e);
         }
     };
 

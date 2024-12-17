@@ -50,11 +50,13 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
     const [contactName, setContactName] = useState("");
 
     const [contact, setContact] = useState<Contact>(initialContact);
-    const [isUpdate, setIsUpdate] = useState(false);
     const [selectedContact, setSelectedContact] = useState("");
 
     const onModalClose = () => {
+        setTimeout(() => (document.body.style.pointerEvents = ""), 300)
+
         setIsModalOpen(false)
+        setContact(initialContact)
     }
 
     const copyToClipboard = async (text: string) => {
@@ -68,15 +70,13 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
         }
     };
     const updateContact = (id: string) => {
-        setIsUpdate(true);
-
         getContactInfo(id);
+        setIsModalOpen(true);
     }
 
     const viewContact = (id: string) => {
-        setIsUpdate(false);
-
         getContactInfo(id);
+        setViewModal(true);
     }
 
     const getContactInfo = async (id: string) => {
@@ -85,7 +85,6 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
 
             if (res.status === 200) {
                 setContact(res?.data);
-                isUpdate ? setIsModalOpen(true) : setViewModal(true);
             }
         } catch (error) {
             console.error(error);
@@ -204,9 +203,13 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
 
 
             </div>
-            <ContactModal contact={contact} disabled={false} isOpen={isModalOpen} onClose={onModalClose} />
+            <ContactModal contact={contact} setContact={setContact} disabled={false} isOpen={isModalOpen} onClose={onModalClose} onSearch={onSearch} />
 
-            <ViewContactModal contact={contact} isOpen={viewModal} onClose={() => setViewModal(false)} onSearch={onSearch} />
+            <ViewContactModal contact={contact} isOpen={viewModal} onClose={() => {
+                setTimeout(() => (document.body.style.pointerEvents = ""), 300)
+                setViewModal(false);
+                setContact(initialContact)
+            }} onSearch={onSearch} />
 
             <DeleteContactModal contactName={contactName} isOpen={isDeleteModalOpen} onClose={() => {
                 setTimeout(() => (document.body.style.pointerEvents = ""), 300)

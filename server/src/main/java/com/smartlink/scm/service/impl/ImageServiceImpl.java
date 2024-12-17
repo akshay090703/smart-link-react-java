@@ -5,12 +5,11 @@ import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.smartlink.scm.helpers.AppConstants;
 import com.smartlink.scm.service.ImageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -47,5 +46,17 @@ public class ImageServiceImpl implements ImageService {
                                 .crop(AppConstants.CONTACT_IMAGE_CROP)
                 )
                 .generate(publicId);
+    }
+
+    @Override
+    public boolean deleteImage(String publicId) {
+        try {
+            Map<?, ?> response = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
+            String result = (String) response.get("result");
+            return "ok".equals(result);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete image from Cloudinary", e);
+        }
     }
 }

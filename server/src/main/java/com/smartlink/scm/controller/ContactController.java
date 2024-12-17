@@ -117,8 +117,12 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContact(@PathVariable String id, @RequestBody ContactForm contactForm, BindingResult result) {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> updateContact(@PathVariable String id, @Valid @ModelAttribute ContactForm contactForm, BindingResult result) {
+        if(result.hasErrors()) {
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+        }
+
+        return contactService.updateContact(id, contactForm);
     }
 }
 

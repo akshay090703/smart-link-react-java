@@ -72,8 +72,40 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact updateContact(ContactForm contact) {
-        return null;
+    public ResponseEntity<?> updateContact(String contactId, ContactForm newContact) {
+        Optional<Contact> contact = contactRepo.findById(contactId);
+
+        if(contact.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        String cloudinaryId = contact.get().getCloudinaryImagePublicId();
+
+        if(cloudinaryId != null && !cloudinaryId.isEmpty()) {
+            imageService.deleteImage(cloudinaryId);
+        }
+
+
+        if(newContact.getContactPhoto() != null && !newContact.getContactPhoto().isEmpty()) {
+            String newPublicId = UUID.randomUUID().toString();
+
+            String fileUrl = imageService.uploadImage(newContact.getContactPhoto(), newPublicId);
+            contact.get().setPicture(fileUrl);
+            contact.get().setCloudinaryImagePublicId(newPublicId);
+        }
+
+        contact.get().setName(newContact.getName());
+        contact.get().setEmail(newContact.getEmail());
+        contact.get().setPhoneNumber(newContact.getPhone());
+        contact.get().setAddress(newContact.getAddress());
+        contact.get().setDescription(newContact.getDescription());
+        contact.get().setWebsiteLink(newContact.getWebsite());
+        contact.get().setLinkedinLink(newContact.getSocialLink());
+        contact.get().setFavorite(newContact.getIsFavorite());
+
+        contactRepo.save(contact.get());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override

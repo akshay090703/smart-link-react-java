@@ -1,21 +1,23 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
 import { FormField } from './FormField';
 import { validateForm } from './validation';
-import { FormData, FormErrors } from './types';
+import { FormErrors, ContactFormData } from './types';
+import { LoadingButton } from '@/components/LoadingButton';
 
 interface ContactFormProps {
-    initialData: FormData;
+    formData: ContactFormData;
     disabled?: boolean;
-    onSubmit: (data: FormData) => void;
+    onSubmit: (formData: ContactFormData) => Promise<void>
+    setFormData: React.Dispatch<React.SetStateAction<ContactFormData>>
+    loading: boolean
 }
 
-export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProps) {
-    const [formData, setFormData] = useState<FormData>(initialData);
+export function ContactForm({ formData, setFormData, disabled, onSubmit, loading }: ContactFormProps) {
     const [errors, setErrors] = useState<FormErrors>({});
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         const newErrors = validateForm(formData);
 
         if (Object.keys(newErrors).length === 0) {
@@ -25,9 +27,9 @@ export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProp
         }
     };
 
-    const handleChange = (field: keyof FormData) => (value: string | boolean) => {
+    const handleChange = (field: keyof ContactFormData) => (value: string | boolean) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        // Clear error when field is modified
+
         if (errors[field]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -62,8 +64,8 @@ export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProp
                 label="Phone Number"
                 name="phoneNumber"
                 type="tel"
-                value={formData.phoneNumber}
-                onChange={handleChange('phoneNumber')}
+                value={formData.phone}
+                onChange={handleChange('phone')}
                 disabled={disabled}
                 errors={errors}
             />
@@ -92,8 +94,8 @@ export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProp
                 label="Favorite"
                 name="favorite"
                 component="switch"
-                value={formData.favorite as boolean}
-                onChange={handleChange('favorite')}
+                value={formData.isFavorite as boolean}
+                onChange={handleChange('isFavorite')}
                 disabled={disabled}
             />
 
@@ -102,8 +104,8 @@ export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProp
                 name="websiteLink"
                 type="url"
                 component='input'
-                value={formData.websiteLink || ''}
-                onChange={handleChange('websiteLink')}
+                value={formData.website || ''}
+                onChange={handleChange('website')}
                 disabled={disabled}
                 errors={errors}
             />
@@ -113,17 +115,17 @@ export function ContactForm({ initialData, disabled, onSubmit }: ContactFormProp
                 name="linkedInLink"
                 type="url"
                 component='input'
-                value={formData.linkedinLink || ''}
-                onChange={handleChange('linkedinLink')}
+                value={formData.socialLink || ''}
+                onChange={handleChange('socialLink')}
                 disabled={disabled}
                 errors={errors}
             />
 
             {!disabled && (
                 <div className="sticky bottom-0 pt-4 bg-white dark:bg-black border-t mt-6">
-                    <Button type="submit" className="w-full">
+                    <LoadingButton type="submit" className="w-full" onClick={handleSubmit} loading={loading}>
                         Save Changes
-                    </Button>
+                    </LoadingButton>
                 </div>
             )}
         </form>

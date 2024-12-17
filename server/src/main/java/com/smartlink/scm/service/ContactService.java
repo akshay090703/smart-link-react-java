@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ContactService {
     Contact createContact(ContactForm contact, HttpServletRequest request);
 
-    Contact updateContact(ContactForm contact);
+    public ResponseEntity<?> updateContact(String contactId, ContactForm newContact);
 
     ResponseEntity<?> deleteContact(String contactId);
 
