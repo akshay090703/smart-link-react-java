@@ -78,7 +78,7 @@ public class ContactServiceImpl implements ContactService {
         if(contact.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
+
         if(newContact.getContactPhoto() != null && !newContact.getContactPhoto().isEmpty()) {
             String newPublicId = UUID.randomUUID().toString();
             String cloudinaryId = contact.get().getCloudinaryImagePublicId();
@@ -112,6 +112,10 @@ public class ContactServiceImpl implements ContactService {
 
         if(contact.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if(contact.get().getCloudinaryImagePublicId() != null && !contact.get().getCloudinaryImagePublicId().isEmpty()) {
+            imageService.deleteImage(contact.get().getCloudinaryImagePublicId());
         }
 
         contactRepo.delete(contact.get());
