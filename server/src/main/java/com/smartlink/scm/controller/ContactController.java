@@ -55,6 +55,7 @@ public class ContactController {
         return new ResponseEntity<>(createdContact, HttpStatus.CREATED);
     }
 
+    @GetMapping("")
     public ResponseEntity<?> getAllContacts(HttpServletRequest request, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size, @RequestParam(value = "sortBy", defaultValue = "name") String sortBy, @RequestParam(value = "order", defaultValue = "asc") String order) {
         String email = tokenUtil.getEmailFromJwt(request);
 

@@ -78,16 +78,14 @@ public class ContactServiceImpl implements ContactService {
         if(contact.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        String cloudinaryId = contact.get().getCloudinaryImagePublicId();
-
-        if(cloudinaryId != null && !cloudinaryId.isEmpty()) {
-            imageService.deleteImage(cloudinaryId);
-        }
-
-
+        
         if(newContact.getContactPhoto() != null && !newContact.getContactPhoto().isEmpty()) {
             String newPublicId = UUID.randomUUID().toString();
+            String cloudinaryId = contact.get().getCloudinaryImagePublicId();
+
+            if(cloudinaryId != null && !cloudinaryId.isEmpty()) {
+                imageService.deleteImage(cloudinaryId);
+            }
 
             String fileUrl = imageService.uploadImage(newContact.getContactPhoto(), newPublicId);
             contact.get().setPicture(fileUrl);

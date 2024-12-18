@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { apiClient } from '../../../../lib/api-client';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface DeleteContactModalProps {
     isOpen: boolean;
@@ -28,6 +29,7 @@ export default function DeleteContactModal({
     onSearch
 }: DeleteContactModalProps) {
     const [isDeleting, setIsDeleting] = useState(false);
+    const navigate = useNavigate();
 
     const handleDelete = async () => {
         try {
@@ -38,6 +40,11 @@ export default function DeleteContactModal({
             if (res.status === 204) {
                 toast.success("Contact was successfully deleted!")
                 onSearch();
+            }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
             }
         } catch (error) {
             console.error('Error deleting contact:', error);

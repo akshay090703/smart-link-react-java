@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class ProfileResponse {
+    private String id;
     private String name;
     private String email;
     private String about;

@@ -34,6 +34,8 @@ public class User implements UserDetails {
     private String profilePic;
     private String phoneNumber;
 
+    private String cloudinaryPublicId;
+
     // info
     private boolean enabled = false;
     private boolean emailVerified = false;

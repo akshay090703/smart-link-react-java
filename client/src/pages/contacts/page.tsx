@@ -59,6 +59,11 @@ const ContactsPage = () => {
                 setTotalPages(res?.data?.totalPages)
                 setTotalElements(res?.data?.totalElements)
             }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
+            }
         } catch (error) {
             console.error(error)
             toast.error("There was an error searching the contacts!")

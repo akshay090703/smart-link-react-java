@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import DeleteContactModal from "../view/_components/ContactDeleteModal";
 import { ViewContactModal } from "../view/_components/ViewContactModal";
+import { useNavigate } from 'react-router-dom';
 
 interface ContactsTableProps {
     contacts: Contact[]; // Required list of contacts
@@ -46,6 +47,7 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [viewModal, setViewModal] = useState(false);
+    const navigate = useNavigate();
 
     const [contactName, setContactName] = useState("");
 
@@ -85,6 +87,11 @@ export function ContactsTable({ contacts, onSearch }: ContactsTableProps) {
 
             if (res.status === 200) {
                 setContact(res?.data);
+            }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
             }
         } catch (error) {
             console.error(error);

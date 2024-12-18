@@ -6,38 +6,21 @@ import { cn } from '@/lib/utils';
 import { FloatingLabel, FloatingInput } from '@/components/FloatingInput';
 import { FloatingLabelForTextArea, FloatingTextarea } from '@/components/FloatingTextarea';
 import { useProfile } from '../../context/UserContext';
-
-interface ProfileData {
-    name: string;
-    email: string;
-    phoneNumber: string;
-    about: string;
-    profileImage?: string
-}
-
-interface ValidationErrors {
-    name?: string;
-    email?: string;
-    phoneNumber?: string;
-    about?: string;
-}
-
-const initialData = {
-    name: '',
-    email: '',
-    phoneNumber: '',
-    about: '',
-    profileImage: 'https://e7.pngegg.com/pngimages/442/17/png-clipart-computer-icons-user-profile-male-user-heroes-head-thumbnail.png',
-};
+import toast from 'react-hot-toast';
+import { initialData, ProfileForm, ValidationErrors } from './types';
+import { apiClient } from '../../lib/api-client';
 
 function ProfilePage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [profileImage, setProfileImage] = useState(initialData.profileImage);
-    const [formData, setFormData] = useState<ProfileData>(initialData);
+    const [formData, setFormData] = useState<ProfileForm>(initialData);
     const [errors, setErrors] = useState<ValidationErrors>({});
+
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { userProfile } = useProfile();
+    const { userProfile, setUserProfile } = useProfile();
+
+    const [previewPhoto, setPreviewPhoto] = useState(userProfile?.profilePic)
+    // const [file, setFile] = useState<File | null>(null)
 
     useEffect(() => {
         if (userProfile) {
@@ -46,8 +29,10 @@ function ProfilePage() {
                 email: userProfile?.email,
                 phoneNumber: userProfile?.phoneNumber,
                 about: userProfile?.about,
-                profileImage: userProfile?.profilePic
+                profileImage: null
             })
+
+            setPreviewPhoto(userProfile?.profilePic)
         }
     }, [userProfile])
 
@@ -94,12 +79,37 @@ function ProfilePage() {
             return;
         }
 
+        const dataToSend = new FormData();
+
+        Object.entries(formData).forEach(([key, value]) => {
+            if (key == "profileImage" && value == null) {
+
+            } else {
+                dataToSend.append(key, value);
+            }
+        })
+        // console.log('Form data:', dataToSend);
+
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            console.log('Form data:', { ...formData, profileImage });
+            const res = await apiClient.put('/user/update/' + userProfile?.id, dataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+
+            if (res.status === 200) {
+                toast.success("Profile successfully updated!")
+                setUserProfile(res?.data);
+                navigate('/dashboard')
+            }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
+            }
         } catch (error) {
+            toast.error("There was some error updating the profile!")
             console.error('Error updating profile:', error);
         } finally {
             setIsLoading(false);
@@ -146,9 +156,14 @@ function ProfilePage() {
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            // In a real app, you would upload the file to a server and get a URL back
+            if (file.size > 7 * 1024 * 1024) {
+                toast.error("The profile image should be less than 7MB")
+                return;
+            }
+
             const imageUrl = URL.createObjectURL(file);
-            setProfileImage(imageUrl);
+            setFormData({ ...formData, profileImage: file })
+            setPreviewPhoto(imageUrl);
         }
     };
 
@@ -172,7 +187,7 @@ function ProfilePage() {
                         <div className="flex-shrink-0">
                             <div className="relative w-48 h-48 group">
                                 <img
-                                    src={profileImage}
+                                    src={previewPhoto}
                                     alt="Profile"
                                     className="w-full h-full object-cover rounded-full"
                                 />
@@ -217,6 +232,7 @@ function ProfilePage() {
                                         id="email"
                                         name="email"
                                         type="email"
+                                        disabled={true}
                                         value={formData.email}
                                         onChange={handleInputChange}
                                         className={cn(errors.email && 'border-destructive')}

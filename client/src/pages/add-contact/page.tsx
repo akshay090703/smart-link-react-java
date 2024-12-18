@@ -102,6 +102,11 @@ const AddContactPage = () => {
                 toast.success("Contact successfully created!")
                 handleReset()
             }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
             toast.error("Error saving the contact!")

@@ -8,6 +8,7 @@ import { useState, useEffect, ChangeEvent } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import toast from 'react-hot-toast';
 import { Spinner } from "@/components/ui/infinite-scroller";
+import { useNavigate } from 'react-router-dom';
 
 interface ContactModalProps {
     contact: Contact;
@@ -42,6 +43,7 @@ export function ContactModal({
     const [file, setFile] = useState<File | null>(null);
     const [formData, setFormData] = useState<ContactFormData>(initialFormData);
     const [isLoading, setLoading] = useState(false)
+    const navigate = useNavigate();
 
     useEffect(() => {
         setFormData({
@@ -99,7 +101,7 @@ export function ContactModal({
             }
         })
 
-        console.log(dataToSend);
+        // console.log(dataToSend);
 
         try {
             const res = await apiClient.put('/user/contacts/' + contact.id, dataToSend, {
@@ -112,6 +114,11 @@ export function ContactModal({
                 toast.success("Contact updated successfully!")
                 onSearch();
                 onClose();
+            }
+
+            if (res.status === 401) {
+                toast.error("Unauthorized user!")
+                navigate('/auth')
             }
         } catch (error) {
             console.error(error)

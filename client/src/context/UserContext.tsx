@@ -4,12 +4,13 @@ import * as React from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
-interface ProfileType {
+export interface ProfileType {
+    id: string,
     name: string,
-    email: string,
+    email?: string,
     about: string,
     profilePic: string,
-    phoneNumber: string,
+    phoneNumber?: string,
 
     // info
     enabled: boolean,
