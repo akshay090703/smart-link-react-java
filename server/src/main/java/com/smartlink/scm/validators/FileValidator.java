@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileValidator implements ConstraintValidator<ValidFile, MultipartFile> {
-    // 5 MB
+    // 3 MB
     private static final long MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 
