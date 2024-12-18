@@ -124,9 +124,9 @@ const AddContactPage = () => {
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const maxSizeInBytes = 7 * 1024 * 1024; // 7 MB
+            const maxSizeInBytes = 3 * 1024 * 1024; // 3 MB
             if (file.size > maxSizeInBytes) {
-                toast.error("Photo size should be less than 7 MB");
+                toast.error("Photo size should be less than 3 MB");
                 return;
             }
 

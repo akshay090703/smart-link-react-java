@@ -74,6 +74,7 @@ function ProfilePage() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (!validateForm()) {
             return;
@@ -90,7 +91,6 @@ function ProfilePage() {
         })
         // console.log('Form data:', dataToSend);
 
-        setIsLoading(true);
         try {
             const res = await apiClient.put('/user/update/' + userProfile?.id, dataToSend, {
                 headers: {
@@ -156,8 +156,8 @@ function ProfilePage() {
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.size > 7 * 1024 * 1024) {
-                toast.error("The profile image should be less than 7MB")
+            if (file.size > 3 * 1024 * 1024) {
+                toast.error("The profile image should be less than 3MB")
                 return;
             }
 

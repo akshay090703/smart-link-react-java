@@ -69,9 +69,9 @@ export function ContactModal({
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const currFile = event.target.files?.[0];
         if (currFile) {
-            const maxSizeInBytes = 7 * 1024 * 1024;
+            const maxSizeInBytes = 3 * 1024 * 1024;
             if (currFile.size > maxSizeInBytes) {
-                toast.error("Photo size should be less than 7 MB");
+                toast.error("Photo size should be less than 3 MB");
                 return;
             }
 

@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class FileValidator implements ConstraintValidator<ValidFile, MultipartFile> {
     // 5 MB
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+    private static final long MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 
     @Override
@@ -24,7 +24,7 @@ public class FileValidator implements ConstraintValidator<ValidFile, MultipartFi
 
         if(file.getSize() > MAX_FILE_SIZE) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("File size exceeds 5MB size").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("File size exceeds 3MB size").addConstraintViolation();
 
             return false;
         }
