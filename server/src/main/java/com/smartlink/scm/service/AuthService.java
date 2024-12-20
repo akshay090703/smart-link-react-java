@@ -23,4 +23,8 @@ public interface AuthService {
     public ResponseEntity<?> isUserLoggedIn(HttpServletRequest request);
 
     public Optional<User> getUserByEmail(String email);
+
+    ResponseEntity<?> verifyEmail(String email);
+
+    ResponseEntity<?> verifyAccount(String email, String otp);
 }

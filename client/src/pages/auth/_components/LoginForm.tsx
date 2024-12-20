@@ -8,11 +8,14 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/LoadingButton";
 import { useProfile } from '../../../context/UserContext';
+import axios from 'axios';
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
     const navigate = useNavigate();
     const { getProfileInfo } = useProfile();
     const [isLoading, setIsLoading] = useState(false);
+    const [isDisabled, setDisabled] = useState(false)
 
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
@@ -69,43 +72,69 @@ const LoginForm = () => {
     };
 
     const onLogin = async (event: React.FormEvent) => {
+        setDisabled(false)
         event?.preventDefault();
         setIsLoading(true);
 
         if (!validateLoginInput()) {
-            toast.error("Please fix all the error!")
+            toast.error("Please fix all the errors!");
             setIsLoading(false);
-            return
+            return;
         }
 
         try {
-            const res: AxiosResponse = await apiClient.post("/auth/login", { loginEmail, loginPassword })
+            const res = await apiClient.post("/auth/login", { loginEmail, loginPassword });
 
-            if (res.status === 200) {
-                getProfileInfo();
+            switch (res.status) {
+                case 200:
+                    await getProfileInfo();
+                    toast.success("Logged in successfully!");
+                    navigate("/dashboard");
+                    break;
 
-                // const data = res.data;
-                // console.log(data);
-                toast.success("Logged in successfully!");
+                case 403:
+                    toast.error("Please enable the account!");
+                    break;
 
-                navigate("/dashboard");
+                default:
+                    toast.error("Unexpected response. Please try again later.");
             }
-        } catch (error) {
-            toast.error("Credentials do not match or login with social links!");
-            console.error(error);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error: ", error.response?.data || error.message);
+                toast.error(error.response?.data || error.message)
+
+                if (error.response?.data == "User is disabled. Please enable account!") {
+                    setDisabled(true);
+                }
+            } else {
+                console.error("Unexpected error: ", error);
+                toast.error("Credentials do not match or login with social links!");
+            }
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 500);
+            setIsLoading(false);
         }
     };
+
 
     return (
         <form>
             <CardHeader>
+                {isDisabled && (
+                    <p className="text-center text-sm text-gray-500 mb-2">
+                        Your account is disabled.{" "}
+                        <Link
+                            to="/auth/verifyAccount"
+                            className="text-blue-500 underline hover:text-blue-700"
+                        >
+                            Enable it here
+                        </Link>
+                    </p>
+                )}
                 <CardTitle>Sign In</CardTitle>
                 <CardDescription>
                     Enter your email and password to access your account
+
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex flex-col gap-2">

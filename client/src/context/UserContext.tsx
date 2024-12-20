@@ -40,7 +40,7 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
             setUserProfile(data);
         } else if (res.status === 401) {
-            console.log("Unauthorized");
+            // console.log("Unauthorized");
             toast.error("Unauthorized user!")
             navigate("/auth")
         }

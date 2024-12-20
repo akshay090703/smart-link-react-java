@@ -3,6 +3,7 @@ package com.smartlink.scm.service.impl;
 import com.smartlink.scm.forms.JwtResponse;
 import com.smartlink.scm.forms.LoginForm;
 import com.smartlink.scm.helpers.AppConstants;
+import com.smartlink.scm.helpers.OtpUtil;
 import com.smartlink.scm.helpers.ResourceNotFoundException;
 import com.smartlink.scm.model.Providers;
 import com.smartlink.scm.model.User;
@@ -15,10 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private OtpUtil otpUtil;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -65,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
 
         if(user1.isPresent()) {
             user1.get().setName(user.getName());
-            user1.get().setEmail(user.getEmail());
+            user1.get().setEmail(user.getEmail().toLowerCase());
             user1.get().setPassword(user.getPassword());
             user1.get().setAbout(user.getAbout());
             user1.get().setPhoneNumber(user.getPhoneNumber());
@@ -113,17 +115,58 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Optional<User> getUserByEmail(String email) {
 
-        return userRepo.findByEmail(email);
+        return userRepo.findByEmail(email.toLowerCase());
+    }
+
+    @Override
+    public ResponseEntity<?> verifyEmail(String email) {
+        Optional<User> user = userRepo.findByEmail(email.toLowerCase());
+//        System.out.println(email.toLowerCase());
+
+        if(user.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if(user.get().isEnabled()) {
+            return new ResponseEntity<>("User already enabled!", HttpStatus.FORBIDDEN);
+        }
+
+        otpUtil.generateAndSaveOtp(email);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> verifyAccount(String email, String otp) {
+        if(otpUtil.verifyOtp(email, otp)) {
+            Optional<User> user = userRepo.findByEmail(email.toLowerCase());
+
+            if(user.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            user.get().setEnabled(true);
+            user.get().setEmailVerified(true);
+            userRepo.save(user.get());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     public ResponseEntity<?> loginUser(LoginForm form, HttpServletResponse response) {
         String email = form.getLoginEmail();
         String password = form.getLoginPassword();
 
-        Optional<User> user = userRepo.findByEmail(email);
+        Optional<User> user = userRepo.findByEmail(email.toLowerCase());
 
         if(!user.isPresent()) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        if(!user.get().isEnabled()) {
+            return new ResponseEntity<>("User is disabled. Please enable account!", HttpStatus.FORBIDDEN);
         }
 
         if(!passwordEncoder.matches(password, user.get().getPassword())) {
