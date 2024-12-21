@@ -2,7 +2,6 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { FloatingInput, FloatingLabel } from "@/components/FloatingInput";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AxiosResponse } from 'axios';
 import { apiClient } from "@/lib/api-client";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";

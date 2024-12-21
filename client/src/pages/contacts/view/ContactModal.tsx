@@ -24,7 +24,6 @@ export function ContactModal({
     isOpen,
     onClose,
     disabled = true,
-    setContact,
     onSearch
 }: ContactModalProps) {
     const initialFormData: ContactFormData = {
