@@ -14,6 +14,7 @@ import AboutPage from "./pages/about/page";
 import ServicesPage from "./pages/services/page";
 import NotFoundPage from "./pages/not-found/page";
 import VerifyAccount from './pages/auth/verifyAccount/page';
+import { SendEmail } from "./pages/sendEmail/page";
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/add-contact" element={<AddContactPage />} />
               <Route path="/contacts" element={<ContactsPage />} />
+              <Route path="/contact/sendEmail" element={<SendEmail />} />
             </Route>
 
             {/* 404 page */}

@@ -27,7 +27,9 @@ export function ViewContactModal({
                     <ViewContactHeader />
                     <ViewContactBody
                         contact={contact}
-                        onSearch={onSearch} />
+                        onSearch={onSearch}
+                        onClose={onClose}
+                    />
                 </> : <Spinner />}
             </DialogContent>
         </Dialog>

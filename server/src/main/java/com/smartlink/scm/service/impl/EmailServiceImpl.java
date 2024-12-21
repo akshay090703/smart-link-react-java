@@ -20,15 +20,21 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username}")
-    private String sender;
+    @Value("${app.domain}")
+    private String domain;
 
     @Override
     public ResponseEntity<?> sendSimpleEmail(EmailDetails emailDetails) {
         try{
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-            mailMessage.setFrom(sender);
+            if(emailDetails.getFrom().isEmpty() || emailDetails.getFrom().isBlank()) {
+                mailMessage.setFrom("smartlink@" + domain);
+            } else {
+                int atIndex = emailDetails.getFrom().indexOf("@");
+                String beforeAt = emailDetails.getFrom().substring(0, atIndex);
+                mailMessage.setFrom(beforeAt + "@" + domain);
+            }
             mailMessage.setTo(emailDetails.getRecipient());
             mailMessage.setSubject(emailDetails.getSubject());
             mailMessage.setText(emailDetails.getBody());
@@ -51,14 +57,23 @@ public class EmailServiceImpl implements EmailService {
         try{
             mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            mimeMessageHelper.setFrom(sender);
+            if(emailDetails.getFrom().isEmpty() || emailDetails.getFrom().isBlank()) {
+                mimeMessageHelper.setFrom("smartlink@" + domain);
+            } else {
+                int atIndex = emailDetails.getFrom().indexOf("@");
+                String beforeAt = emailDetails.getFrom().substring(0, atIndex);
+                mimeMessageHelper.setFrom(beforeAt + "@" + domain);
+
+                System.out.println(beforeAt + "@" + domain);
+            }
+
             mimeMessageHelper.setTo(emailDetails.getRecipient());
             mimeMessageHelper.setSubject(emailDetails.getSubject());
             mimeMessageHelper.setText(emailDetails.getBody());
 
-            FileSystemResource file = new FileSystemResource(new File(emailDetails.getAttachment()));
-
-            mimeMessageHelper.addAttachment(file.getFilename(), file);
+            if(emailDetails.getAttachment() != null) {
+                mimeMessageHelper.addAttachment(emailDetails.getAttachment().getOriginalFilename(), emailDetails.getAttachment());
+            }
 
             javaMailSender.send(mimeMessage);
             return new ResponseEntity<>(emailDetails, HttpStatus.OK);

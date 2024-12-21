@@ -2,18 +2,28 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ViewContactImage } from "./ViewContactImage";
 import { ViewContactInfo } from "./ViewContactInfo";
 import { Contact } from "./types";
-import { Trash2 } from "lucide-react";
+import { Mail, Trash2 } from "lucide-react";
 import { useState } from "react";
 import DeleteContactModal from "./ContactDeleteModal";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface ViewContactBodyProps {
     contact: Contact;
     onSearch: () => void
+    onClose: () => void;
 }
 
-export function ViewContactBody({ contact, onSearch }: ViewContactBodyProps) {
+export function ViewContactBody({ contact, onSearch, onClose }: ViewContactBodyProps) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const navigate = useNavigate();
+
+    const onClick = () => {
+        navigate('/contact/sendEmail', {
+            state: contact.email
+        });
+        onClose();
+    }
 
     return (
         <ScrollArea className="h-full">
@@ -36,6 +46,17 @@ export function ViewContactBody({ contact, onSearch }: ViewContactBodyProps) {
                             >
                                 <Trash2 className="h-4 w-4" />
                                 Delete Contact
+                            </Button>
+                        </div>
+
+                        <div className="">
+                            <Button
+                                onClick={onClick}
+                                variant="secondary"
+                                className="bg-blue-500 hover:bg-blue-600 text-white"
+                            >
+                                <Mail className="h-4 w-4" />
+                                Send Email
                             </Button>
                         </div>
                     </div>
