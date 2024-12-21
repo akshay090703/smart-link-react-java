@@ -34,9 +34,20 @@ export function EmailForm({ onSubmit, isLoading, recipient }: EmailFormProps) {
         attachment: null,
     });
 
+    const resetForm = () => {
+        setFormData({
+            sender: senderEmail,
+            recipient: recipient,
+            subject: '',
+            body: '',
+            attachment: null,
+        })
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await onSubmit(formData);
+        resetForm()
     };
 
     const handleChange = (

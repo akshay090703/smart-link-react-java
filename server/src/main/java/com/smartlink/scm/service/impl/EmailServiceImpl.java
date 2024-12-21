@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.Objects;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -23,22 +24,24 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.domain}")
     private String domain;
 
+    @Value("${spring.mail.username}")
+    private String sender;
+
     @Override
     public ResponseEntity<?> sendSimpleEmail(EmailDetails emailDetails) {
-        try{
+        try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-            if(emailDetails.getFrom().isEmpty() || emailDetails.getFrom().isBlank()) {
-                mailMessage.setFrom("smartlink@" + domain);
-            } else {
-                int atIndex = emailDetails.getFrom().indexOf("@");
-                String beforeAt = emailDetails.getFrom().substring(0, atIndex);
-                mailMessage.setFrom(beforeAt + "@" + domain);
+            if (!emailDetails.getFrom().isEmpty() && !emailDetails.getFrom().isBlank()) {
+                emailDetails.setSubject("From " + emailDetails.getFrom() + ": " + emailDetails.getSubject());
             }
+
+            mailMessage.setFrom(sender);
             mailMessage.setTo(emailDetails.getRecipient());
             mailMessage.setSubject(emailDetails.getSubject());
             mailMessage.setText(emailDetails.getBody());
 
+            // Send the simple email
             javaMailSender.send(mailMessage);
 
             return new ResponseEntity<>(emailDetails, HttpStatus.OK);
@@ -52,31 +55,27 @@ public class EmailServiceImpl implements EmailService {
     public ResponseEntity<?> sendEmailWithAttachment(EmailDetails emailDetails) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-        MimeMessageHelper mimeMessageHelper;
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-        try{
-            mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
-            if(emailDetails.getFrom().isEmpty() || emailDetails.getFrom().isBlank()) {
-                mimeMessageHelper.setFrom("smartlink@" + domain);
-            } else {
-                int atIndex = emailDetails.getFrom().indexOf("@");
-                String beforeAt = emailDetails.getFrom().substring(0, atIndex);
-                mimeMessageHelper.setFrom(beforeAt + "@" + domain);
-
-                System.out.println(beforeAt + "@" + domain);
+            if (!emailDetails.getFrom().isEmpty() && !emailDetails.getFrom().isBlank()) {
+                emailDetails.setSubject("From " + emailDetails.getFrom() + ": " + emailDetails.getSubject());
             }
 
+            mimeMessageHelper.setTo(sender);
             mimeMessageHelper.setTo(emailDetails.getRecipient());
             mimeMessageHelper.setSubject(emailDetails.getSubject());
             mimeMessageHelper.setText(emailDetails.getBody());
 
-            if(emailDetails.getAttachment() != null) {
-                mimeMessageHelper.addAttachment(emailDetails.getAttachment().getOriginalFilename(), emailDetails.getAttachment());
+            // Add attachment if present
+            if (emailDetails.getAttachment() != null && !emailDetails.getAttachment().isEmpty()) {
+                mimeMessageHelper.addAttachment(Objects.requireNonNull(emailDetails.getAttachment().getOriginalFilename()), emailDetails.getAttachment());
             }
 
+            // Send the email with attachment
             javaMailSender.send(mimeMessage);
-            return new ResponseEntity<>(emailDetails, HttpStatus.OK);
+
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

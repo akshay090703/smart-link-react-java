@@ -1,6 +1,7 @@
 package com.smartlink.scm.model;
 
 import com.smartlink.scm.validators.ValidFile;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,11 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class EmailDetails {
     private String from;
-    @NotEmpty
+    @Email(message = "Not a valid email")
     private String recipient;
-    @NotEmpty
+    @NotEmpty(message = "Must not be empty")
     private String subject;
     private String body;
-    @ValidFile
     private MultipartFile attachment;
 }

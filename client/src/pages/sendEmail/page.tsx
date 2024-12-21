@@ -6,9 +6,11 @@ import { apiClient } from '../../lib/api-client';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useProfile } from '../../context/UserContext';
 
 export function SendEmail() {
     const [isLoading, setIsLoading] = useState(false);
+    const { userProfile } = useProfile();
     const navigate = useNavigate();
     const location = useLocation();
     const recipient = location.state;
@@ -16,10 +18,8 @@ export function SendEmail() {
     const handleSendEmail = async (emailDetails: EmailDetails) => {
         setIsLoading(true);
 
-        console.log(emailDetails);
-
         const formData = new FormData();
-        formData.append('from', emailDetails.sender || '');
+        formData.append('from', userProfile?.email || "");
         formData.append('recipient', emailDetails.recipient);
         formData.append('subject', emailDetails.subject)
         formData.append('body', emailDetails.body);
@@ -28,7 +28,7 @@ export function SendEmail() {
             formData.append('attachment', emailDetails.attachment)
         }
 
-        console.log(formData);
+        // console.log(formData);
 
 
         try {
@@ -42,6 +42,7 @@ export function SendEmail() {
                 toast.success('Email sent successfully');
             }
         } catch (error) {
+            console.error(error)
             toast.error('Failed to send email');
         } finally {
             setIsLoading(false);
