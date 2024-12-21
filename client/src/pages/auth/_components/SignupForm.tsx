@@ -8,6 +8,7 @@ import { AxiosResponse } from "axios";
 import { FloatingLabelForTextArea, FloatingTextarea } from "@/components/FloatingTextarea";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import axios from 'axios';
 
 const SignupForm = () => {
     const navigate = useNavigate();
@@ -134,8 +135,19 @@ const SignupForm = () => {
                 toast.success("Account created successfully!");
             }
         } catch (error) {
-            toast.error("Error creating the account!");
-            console.error(error);
+            if (axios.isAxiosError(error)) {
+                console.error("Axios error: ", error.response?.data || error.message);
+
+                if (error.message == "Request failed with status code 400") {
+                    toast.error(error.response?.data)
+                } else {
+                    toast.error(error.response?.data || error.message)
+                }
+            } else {
+                console.error("Unexpected error: ", error);
+                toast.error("Error creating the account!");
+            }
+
         } finally {
             setTimeout(() => {
                 setIsLoading(false);

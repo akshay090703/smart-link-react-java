@@ -43,8 +43,8 @@ public class AuthController {
     private EmailService emailService;
 
     @PostMapping("/signup")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserForm form, BindingResult rBindingResult) {
-        System.out.println(form);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserForm form, BindingResult rBindingResult) {
+//        System.out.println(form);
 
         if(rBindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -60,6 +60,10 @@ public class AuthController {
 
 
         User createdUser = authService.saveUser(user);
+
+        if(createdUser == null) {
+            return new ResponseEntity<>("User with the same email already exists!", HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }

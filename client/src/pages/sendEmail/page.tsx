@@ -40,6 +40,7 @@ export function SendEmail() {
 
             if (response.status === 200) {
                 toast.success('Email sent successfully');
+
             }
         } catch (error) {
             console.error(error)

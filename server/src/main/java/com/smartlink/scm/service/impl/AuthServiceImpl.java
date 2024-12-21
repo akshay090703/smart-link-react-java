@@ -47,6 +47,11 @@ public class AuthServiceImpl implements AuthService {
         String userId = UUID.randomUUID().toString();
         user.setUserId(userId);
 
+        Optional<User> dbUser = userRepo.findByEmail(user.getEmail());
+        if(dbUser.isPresent()) {
+            return null;
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         user.setRoleList(List.of(AppConstants.ROLE_USER));
